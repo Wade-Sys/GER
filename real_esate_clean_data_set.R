@@ -1,5 +1,5 @@
 #library(tidyverse)
-#df_raw <- read_csv("data/immo_data.csv")
+df_raw <- read_csv("data/immo_data.csv")
 
 # Nicht benotigte Spalte entfernen
 df_clean_cols <- subset(df_raw, select = -c(

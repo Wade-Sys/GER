@@ -5,6 +5,7 @@ library(shinyWidgets)
 library(shinyjs)
 library(DT)
 library(ggplot2)
+library(tidyverse)
 
 # Helper functions
 
@@ -16,9 +17,9 @@ shinyUI(
         dashboardHeader(title = "German real estates",titleWidth = 300),
         dashboardSidebar(width = 300,
                          sidebarMenu(id = "tabs",
-                                     menuItem("Dash Board", tabName = "dashBoard", icon = icon("clipboard")),
+                                     menuItem("Dash Board", tabName = "dashBoard", icon = icon("tachometer-alt")),
                                      menuItem("Datengrundlage", tabName = "baseData", icon = icon("table")),
-                                     menuItem("Mietpreisschätzung", tabName = "rpe", icon = icon("building"))
+                                     menuItem("Mietpreisschätzung", tabName = "rpe", icon = icon("chart-line"))
                          )
         ),
         dashboardBody(
@@ -174,7 +175,7 @@ shinyUI(
                             box(width=NULL, solidHeader = TRUE, status = "primary", title = "(2) Ergebnisse der Mietpreisschätzung:",
                                 fluidRow(
                                     column(12,
-                                           infoBoxOutput("price"),       
+                                           valueBoxOutput("vBoxPrice"),       
                                     )
                                 )
                             )
