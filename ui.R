@@ -177,6 +177,11 @@ shinyUI(
                                     column(12,
                                            valueBoxOutput("vBoxPrice"),       
                                     )
+                                ),
+                                fluidRow(
+                                    column(12,
+                                           plotOutput("plotModellResiduals")
+                                    )
                                 )
                             )
                         )

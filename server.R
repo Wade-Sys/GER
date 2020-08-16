@@ -6,6 +6,9 @@ library(DT)
 library(ggplot2)
 library(tidyverse)
 
+
+#df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
     
@@ -63,26 +66,31 @@ shinyServer(function(input, output, session) {
       lmFormula <- createFormula(input)
       dfDatasetToPredict <- createFeatureDF(input)
       if(lmFormula == 0) {
-        print("NO")
+        predictEstate <- 0
       }
       else {
         withProgress(message = "Mietpreis wird geschätzt...", value = 0, min =0, max = 100, {
-          incProgress(amount = 25, message = paste("Modell wird erstellt..."))
+          incProgress(amount = 25, message = paste("Modell wird berechnet..."))
           fitEstate <- lm(data_immo(), formula = lmFormula)
           incProgress(amount = 50, message = paste("Mietpreis wird geschäzt..."))
           predictEstate <- predict(object = fitEstate, dfDatasetToPredict)
         
           #print(summary(fitEstate))
-          print(predictEstate)
-          incProgress(amount = 75, message = paste("Ausgabe..."))
+          #print(predictEstate)
           output$vBoxPrice <- renderValueBox({
-            valueBox(
-              subtitle = "Geschätzter Mietpreis: ", value = paste0(round(predictEstate,2), "€"), icon = icon("building"), color = "green"
-            )
+            valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0(round(predictEstate,2), "€"), icon = icon("building"), color = "green")
+          })
+          print(summary(fitEstate$residuals))
+          print(typeof(fitEstate$residuals))
+          
+          output$plotModellResiduals <-renderPlot({
+            ##incProgress(amount = 75, message = paste("Plots werden generiert..."))
+            ggplot(fortify(fitEstate), aes(x="tt", y="test")) + geom_boxplot()
+            #par(mfrow = c(4,1))
+            #plot(fitEstate)
           })
         })
       }
-      
     })
     ## ---------------------------------------------------------------------------------------------------------------------------------
     ## Tab: baseData
