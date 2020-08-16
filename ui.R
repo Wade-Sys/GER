@@ -39,24 +39,84 @@ shinyUI(
                             box(width=NULL, solidHeader = TRUE, status = "primary", title = "(1) Welche Parameter sollen bei der Schätzung berücksichtigt werden?",
                                 column(12,
                                     box(width=NULL, solidHeader = TRUE, status = "warning", title = "Region:",collapsible = TRUE, collapsed = FALSE,
-                                        prettySwitch(inputId = "switchBL",label = "Bundesland:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        selectInput("bundesland", label = NULL, choices = NULL),
-                                        prettySwitch(inputId = "switchLK",label = "Landkreis:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        selectInput("landkreis", label = NULL, choices = NULL)
+                                        fluidRow(
+                                            column(12,
+                                                column(3,
+                                                       prettySwitch(inputId = "switchBL",label = "Bundesland:",value = TRUE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                ),
+                                                column(9,
+                                                       selectInput("bundesland", label = NULL, choices = NULL)
+                                                )
+                                            )  
+                                        ),
+                                        fluidRow(
+                                            column(12,
+                                                   column(3,
+                                                        prettySwitch(inputId = "switchLK",label = "Landkreis:",value = TRUE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(9,
+                                                        selectInput("landkreis", label = NULL, choices = NULL)
+                                                   )
+                                            )  
+                                        )
                                     ),
                                     box(width=NULL, solidHeader = TRUE, status = "warning", title = "Wohnungsparameter:", collapsible = TRUE, collapsed = FALSE,
-                                        prettySwitch(inputId = "switchTOF",label = "Typ:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        selectInput("typeOfFlat", label = NULL, choices = NULL),
-                                        prettySwitch(inputId = "switchHT",label = "Heizungsart:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        selectInput("heatingType", label = NULL, choices = NULL),
-                                        prettySwitch(inputId = "switchYC",label = "Baujahr:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        selectInput("yearConstructed", label = NULL, sort(seq(1215,2020))),
-                                        prettySwitch(inputId = "switchLS",label = "Wohnfläche in qm:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        numericInput("livingSpace", label = NULL, min = 1, value = 50),
-                                        prettySwitch(inputId = "switchNR",label = "Zimmeranzahl:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        numericInput("noRooms", label = NULL, min = 1, value = 2),
-                                        prettySwitch(inputId = "switchF",label = "Stockwerk:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE),
-                                        numericInput("floor", label = NULL, min = -1, value = 1)
+                                        fluidRow(
+                                            column(6,
+                                                   column(7,
+                                                          prettySwitch(inputId = "switchYC",label = "Baujahr:",value = TRUE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(5,
+                                                          numericInput("yearConstructed", label = NULL, min = 1215, max = 2020, value = 2010)
+                                                   )
+                                            ),
+                                            column(6,
+                                                   column(7,
+                                                          prettySwitch(inputId = "switchLS",label = "Wohnfläche in qm:",value = TRUE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(5,
+                                                          numericInput("livingSpace", label = NULL, min = 1, value = 50)
+                                                   )
+                                            )
+                                        ),
+                                        fluidRow(
+                                            column(6,
+                                                   column(7,
+                                                          prettySwitch(inputId = "switchNR",label = "Zimmeranzahl:",value = TRUE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(5,
+                                                          numericInput("noRooms", label = NULL, min = 1, value = 2)
+                                                   )
+                                            ),
+                                            column(6,
+                                                   column(7,
+                                                          prettySwitch(inputId = "switchF",label = "Stockwerk:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(5,
+                                                          numericInput("floor", label = NULL, min = -1, value = 1)
+                                                   )
+                                            )
+                                        ),
+                                        fluidRow(
+                                            column(12,
+                                                   column(3,
+                                                          prettySwitch(inputId = "switchTOF",label = "Typ:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(9,
+                                                          selectInput("typeOfFlat", label = NULL, choices = NULL)
+                                                   )
+                                            )
+                                        ),
+                                        fluidRow(
+                                            column(12,
+                                                   column(3,
+                                                          prettySwitch(inputId = "switchHT",label = "Heizungsart:",value = FALSE, bigger = FALSE, slim = FALSE, width = "100%",fill = TRUE, status = "warning", inline = TRUE)
+                                                   ),
+                                                   column(9,
+                                                          selectInput("heatingType", label = NULL, choices = NULL)
+                                                   )
+                                            )
+                                        ),
                                     ),
                                     box(width=NULL, solidHeader = TRUE, status = "warning", title = "Ausstattung", collapsible = TRUE, collapsed = FALSE,
                                         fluidRow(
@@ -111,7 +171,13 @@ shinyUI(
                             )
                         ),
                         column(7,
-                            box(width=NULL, solidHeader = TRUE, status = "primary", title = "(2) Ergebnisse der Mietpreisschätzung:")
+                            box(width=NULL, solidHeader = TRUE, status = "primary", title = "(2) Ergebnisse der Mietpreisschätzung:",
+                                fluidRow(
+                                    column(12,
+                                           infoBoxOutput("price"),       
+                                    )
+                                )
+                            )
                         )
                     )
                 )
