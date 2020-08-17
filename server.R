@@ -4,7 +4,7 @@ library(shinyWidgets)
 library(shinyjs)
 library(DT)
 library(ggplot2)
-library(tidyverse)
+#library(car)
 
 
 #df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
@@ -75,19 +75,23 @@ shinyServer(function(input, output, session) {
           incProgress(amount = 50, message = paste("Mietpreis wird geschäzt..."))
           predictEstate <- predict(object = fitEstate, dfDatasetToPredict)
         
-          #print(summary(fitEstate))
+          print(summary(fitEstate$signifi))
           #print(predictEstate)
           output$vBoxPrice <- renderValueBox({
             valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0(round(predictEstate,2), "€"), icon = icon("building"), color = "green")
           })
-          print(summary(fitEstate$residuals))
-          print(typeof(fitEstate$residuals))
-          
-          output$plotModellResiduals <-renderPlot({
-            ##incProgress(amount = 75, message = paste("Plots werden generiert..."))
-            ggplot(fortify(fitEstate), aes(x="tt", y="test")) + geom_boxplot()
-            #par(mfrow = c(4,1))
-            #plot(fitEstate)
+
+          output$plotModellResiduals_1 <-renderPlot({
+            plot(fitEstate,which= 1)
+          })
+          output$plotModellResiduals_2 <-renderPlot({
+            plot(fitEstate,which= 2)
+          })
+          output$plotModellResiduals_3 <-renderPlot({
+            plot(fitEstate,which= 3)
+          })
+          output$plotModellResiduals_4 <-renderPlot({
+            plot(fitEstate,which= 4)
           })
         })
       }

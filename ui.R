@@ -180,7 +180,21 @@ shinyUI(
                                 ),
                                 fluidRow(
                                     column(12,
-                                           plotOutput("plotModellResiduals")
+                                           plotOutput("plotModellResiduals_1")
+                                    )
+                                ),
+                                fluidRow(
+                                    column(12,
+                                           plotOutput("plotModellResiduals_2")
+                                    )
+                                ),
+                                fluidRow(
+                                    column(12,
+                                           plotOutput("plotModellResiduals_3")
+                                    )
+                                ),fluidRow(
+                                    column(12,
+                                           plotOutput("plotModellResiduals_4")
                                     )
                                 )
                             )
