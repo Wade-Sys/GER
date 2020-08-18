@@ -175,26 +175,24 @@ shinyUI(
                             box(width=NULL, solidHeader = TRUE, status = "primary", title = "(2) Ergebnisse der Mietpreisschätzung:",
                                 fluidRow(
                                     column(12,
-                                           valueBoxOutput("vBoxPrice"),       
+                                           valueBoxOutput("vBoxPrice", width = NULL)       
                                     )
                                 ),
                                 fluidRow(
                                     column(12,
-                                           plotOutput("plotModellResiduals_1")
-                                    )
+                                        box(width = NULL, solidHeader = TRUE, status = "warning", title = "Angaben zum Modell:",collapsible = TRUE, collapsed = TRUE
+                                            
+                                        )
+                                    )  
                                 ),
                                 fluidRow(
                                     column(12,
-                                           plotOutput("plotModellResiduals_2")
-                                    )
-                                ),
-                                fluidRow(
-                                    column(12,
-                                           plotOutput("plotModellResiduals_3")
-                                    )
-                                ),fluidRow(
-                                    column(12,
-                                           plotOutput("plotModellResiduals_4")
+                                        box(width = NULL, solidHeader = TRUE, status = "warning", title = "Residuendiagramme:",collapsible = TRUE, collapsed = TRUE,
+                                            fluidRow(column(12,plotOutput("plotModellResiduals_1"))),    
+                                            fluidRow(column(12,plotOutput("plotModellResiduals_2"))),
+                                            fluidRow(column(12,plotOutput("plotModellResiduals_3"))),
+                                            fluidRow(column(12,plotOutput("plotModellResiduals_4")))
+                                        )
                                     )
                                 )
                             )

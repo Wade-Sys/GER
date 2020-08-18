@@ -4,6 +4,7 @@ library(shinyWidgets)
 library(shinyjs)
 library(DT)
 library(ggplot2)
+library(broom)
 #library(car)
 
 
@@ -27,6 +28,22 @@ shinyServer(function(input, output, session) {
       updateSelectInput(session = session, inputId = "bundesland", choices = bundeslaender())
       updateSelectInput(session = session, inputId = "typeOfFlat", choices = typeOfFlat())
       updateSelectInput(session = session, inputId = "heatingType", choices = heatingType())
+      
+      output$vBoxPrice <- renderValueBox({ 
+        valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0("0.00", "€"), icon = icon("building"), color = "green")
+      })
+      output$plotModellResiduals_1 <-renderPlot({
+        plot(0)
+      })
+      output$plotModellResiduals_2 <-renderPlot({
+        plot(0)
+      })
+      output$plotModellResiduals_3 <-renderPlot({
+        plot(0)
+      })
+      output$plotModellResiduals_4 <-renderPlot({
+        plot(0)
+      })
     })
     
     # Observe toggles
@@ -75,14 +92,15 @@ shinyServer(function(input, output, session) {
           incProgress(amount = 50, message = paste("Mietpreis wird geschäzt..."))
           predictEstate <- predict(object = fitEstate, dfDatasetToPredict)
         
-          print(summary(fitEstate$signifi))
+          #print(summary(fitEstate$signifi))
           #print(predictEstate)
-          output$vBoxPrice <- renderValueBox({
+          output$vBoxPrice <- renderValueBox({ 
             valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0(round(predictEstate,2), "€"), icon = icon("building"), color = "green")
           })
-
+          
+          incProgress(amount = 75, message = paste("Residuendiagramme werden generiert..."))
           output$plotModellResiduals_1 <-renderPlot({
-            plot(fitEstate,which= 1)
+            plot(fitEstate,which= 1,panel = panel.smooth)
           })
           output$plotModellResiduals_2 <-renderPlot({
             plot(fitEstate,which= 2)
