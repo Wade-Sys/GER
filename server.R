@@ -100,7 +100,7 @@ shinyServer(function(input, output, session) {
           
           incProgress(amount = 75, message = paste("Residuendiagramme werden generiert..."))
           output$plotModellResiduals_1 <-renderPlot({
-            plot(fitEstate,which= 1,panel = panel.smooth)
+            plot(fitEstate,which= 1)
           })
           output$plotModellResiduals_2 <-renderPlot({
             plot(fitEstate,which= 2)
@@ -111,6 +111,25 @@ shinyServer(function(input, output, session) {
           output$plotModellResiduals_4 <-renderPlot({
             plot(fitEstate,which= 4)
           })
+          
+          #output$modellSummary_1 <- renderTable({
+          #  
+          #})
+          fitEstateSummary <- summary(fitEstate)
+          print(paste("Freiheitsgrade: ", fitEstate$df.residual))
+          print(paste("Standardschätzfehler: ", round(fitEstateSummary$sigma,3)))
+          print(paste("R-Quadrat: ", round(fitEstateSummary$r.squared,3)))
+          print(paste("Korrigiertes R-Quadrat: ", round(fitEstateSummary$adj.r.squared,3)))
+          print(paste("Teststatistik F-Wert: ", round(fitEstateSummary$fstatistic[1],3)))
+          pValue <- pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE)
+          #print(fitEstateSummary$fstatistic[1])
+          #print(fitEstateSummary$fstatistic[2])
+          #print(fitEstateSummary$fstatistic[3])
+          
+          print(pValue)
+          
+          #fitEstateSummary <- summary(fitEstate)
+ 
         })
       }
     })

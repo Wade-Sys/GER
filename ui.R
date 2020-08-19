@@ -180,8 +180,8 @@ shinyUI(
                                 ),
                                 fluidRow(
                                     column(12,
-                                        box(width = NULL, solidHeader = TRUE, status = "warning", title = "Angaben zum Modell:",collapsible = TRUE, collapsed = TRUE
-                                            
+                                        box(width = NULL, solidHeader = TRUE, status = "warning", title = "Angaben zum Modell:",collapsible = TRUE, collapsed = TRUE,
+                                            tableOutput("modellSummary_1")
                                         )
                                     )  
                                 ),
