@@ -32,6 +32,26 @@ shinyServer(function(input, output, session) {
       output$vBoxPrice <- renderValueBox({ 
         valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0("0.00", "€"), icon = icon("building"), color = "green")
       })
+      
+      output$degreesOfFreedom <-renderValueBox({ 
+        valueBox(subtitle = "Freiheitsgrade: ", value = paste0("0.000"), icon = icon("ruler-combined"), color = "green")
+      })
+      output$residualStdError <- renderValueBox({ 
+        valueBox(subtitle = "Standardschätzfehler: ", value = paste0("0.000"), icon = icon("ruler-vertical"), color = "green")
+      })
+      output$rSquared <- renderValueBox({ 
+        valueBox(subtitle = "R-Quadrat: ", value = paste0("0.000"), icon = icon("draw-polygon"), color = "green")
+      })
+      output$AdjRSquared <- renderValueBox({ 
+        valueBox(subtitle = "Korrigiertes R-Quadrat: ", value = paste0("0.000"), icon = icon("vector-square"), color = "green")
+      })
+      output$fStatistic <- renderValueBox({ 
+        valueBox(subtitle = "Teststatistik F-Wert: ", value = paste0("0.000"), icon = icon("vial"), color = "green")
+      })
+      output$pValueFromFtest <- renderValueBox({ 
+        valueBox(subtitle = "p-Wert des F-Tests", value = paste0("0.000"), icon = icon("vials"), color = "green")
+      })
+      
       output$plotModellResiduals_1 <-renderPlot({
         plot(0)
       })
@@ -98,6 +118,37 @@ shinyServer(function(input, output, session) {
             valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0(round(predictEstate,2), "€"), icon = icon("building"), color = "green")
           })
           
+          incProgress(amount = 75, message = paste("Angaben zum Modell werden ermittelt..."))
+          
+          fitEstateSummary <- summary(fitEstate)
+          print(fitEstateSummary)
+          #print(paste("Freiheitsgrade: ", fitEstate$df.residual))
+          #print(paste("Standardschätzfehler: ", round(fitEstateSummary$sigma,3)))
+          #print(paste("R-Quadrat: ", round(fitEstateSummary$r.squared,3)))
+          #print(paste("Korrigiertes R-Quadrat: ", round(fitEstateSummary$adj.r.squared,3)))
+          #print(paste("Teststatistik F-Wert: ", round(fitEstateSummary$fstatistic[1],3)))
+          #print(paste("p-Wert: ",round(pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE),3)))
+          
+          
+          output$degreesOfFreedom <-renderValueBox({ 
+            valueBox(subtitle = "Freiheitsgrade: ", value = paste0(fitEstate$df.residual), icon = icon("ruler-combined"), color = "green")
+          })
+          output$residualStdError <- renderValueBox({ 
+            valueBox(subtitle = "Standardschätzfehler: ", value = paste0(round(fitEstateSummary$sigma,3)), icon = icon("ruler-vertical"), color = "green")
+          })
+          output$rSquared <- renderValueBox({ 
+            valueBox(subtitle = "R-Quadrat: ", value = paste0(round(fitEstateSummary$r.squared,3)), icon = icon("draw-polygon"), color = "green")
+          })
+          output$AdjRSquared <- renderValueBox({ 
+            valueBox(subtitle = "Korrigiertes R-Quadrat: ", value = paste0(round(fitEstateSummary$adj.r.squared,3)), icon = icon("vector-square"), color = "green")
+          })
+          output$fStatistic <- renderValueBox({ 
+            valueBox(subtitle = "Teststatistik F-Wert: ", value = paste0(round(fitEstateSummary$fstatistic[1],3)), icon = icon("vial"), color = "green")
+          })
+          output$pValueFromFtest <- renderValueBox({ 
+            valueBox(subtitle = "p-Wert des F-Tests", value = paste0(round(pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE),3)), icon = icon("vials"), color = "green")
+          })
+          
           incProgress(amount = 75, message = paste("Residuendiagramme werden generiert..."))
           output$plotModellResiduals_1 <-renderPlot({
             plot(fitEstate,which= 1)
@@ -111,24 +162,6 @@ shinyServer(function(input, output, session) {
           output$plotModellResiduals_4 <-renderPlot({
             plot(fitEstate,which= 4)
           })
-          
-          #output$modellSummary_1 <- renderTable({
-          #  
-          #})
-          fitEstateSummary <- summary(fitEstate)
-          print(paste("Freiheitsgrade: ", fitEstate$df.residual))
-          print(paste("Standardschätzfehler: ", round(fitEstateSummary$sigma,3)))
-          print(paste("R-Quadrat: ", round(fitEstateSummary$r.squared,3)))
-          print(paste("Korrigiertes R-Quadrat: ", round(fitEstateSummary$adj.r.squared,3)))
-          print(paste("Teststatistik F-Wert: ", round(fitEstateSummary$fstatistic[1],3)))
-          pValue <- pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE)
-          #print(fitEstateSummary$fstatistic[1])
-          #print(fitEstateSummary$fstatistic[2])
-          #print(fitEstateSummary$fstatistic[3])
-          
-          print(pValue)
-          
-          #fitEstateSummary <- summary(fitEstate)
  
         })
       }

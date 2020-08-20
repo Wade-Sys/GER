@@ -181,7 +181,16 @@ shinyUI(
                                 fluidRow(
                                     column(12,
                                         box(width = NULL, solidHeader = TRUE, status = "warning", title = "Angaben zum Modell:",collapsible = TRUE, collapsed = TRUE,
-                                            tableOutput("modellSummary_1")
+                                            fluidRow(
+                                                column(4,valueBoxOutput("degreesOfFreedom", width = NULL)),
+                                                column(4,valueBoxOutput("rSquared", width = NULL)),
+                                                column(4,valueBoxOutput("fStatistic", width = NULL))
+                                            ),
+                                            fluidRow(
+                                                column(4,valueBoxOutput("residualStdError", width = NULL)),
+                                                column(4,valueBoxOutput("AdjRSquared", width = NULL)),
+                                                column(4,valueBoxOutput("pValueFromFtest", width = NULL))
+                                            )
                                         )
                                     )  
                                 ),
