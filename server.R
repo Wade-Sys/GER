@@ -1,3 +1,4 @@
+
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
@@ -7,24 +8,62 @@ library(ggplot2)
 library(broom)
 #library(car)
 
-
 #df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-
-    
     # Create reactive datasets
     data_immo <- reactive(df_immo_cleaned)
     bundeslaender <- reactive(unique(sort(data_immo()$regio1)))
     landkreiseAll <- reactive(unique(data_immo()[c('regio1','regio2')]))
     typeOfFlat <- reactive(unique(sort(data_immo()$typeOfFlat)))
     heatingType <- reactive(unique(sort(data_immo()$heatingType)))
+    data_immo_subset_db <- reactive(0)
+    immoDashboardStatistics <- reactive(0)
     
     ## Tab: dashboard
     ## ---------------------------------------------------------------------------------------------------------------------------------
     
+    # Observe Bundesland
+    observe(priority = 100, {
+      updateSelectInput(session = session, inputId = "dbBundesland", choices = c("Alle",bundeslaender()))
+    })
+    
+    # Observe Landkreis
+    observe(priority = 100, {
+      if(input$dbBundesland == 'Alle') {
+        dbLkSelected <- subset(landkreiseAll(), select = c("regio2"))
         
+      } else {
+        dbLkSelected <- subset(landkreiseAll(), grepl(input$dbBundesland, landkreiseAll()$regio1),select = c("regio2"))
+      }
+      
+      updateSelectInput(session = session, inputId = "dbLandkreis", choices = c("Alle",sort(unique(dbLkSelected$regio2))))
+      
+    })
+    
+    # Observe values
+    observe(priority = 100, {
+      
+      # Subset data by Bundesland and Landkreis for computation
+      if(input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") {
+        data_immo_subset_db <- data_immo()
+      }
+      else if(input$dbBundesland == "Alle" && input$dbLandkreis != "Alle") {
+        data_immo_subset_db <- subset(data_immo(), grepl(input$dbLandkreis, data_immo()$regio2))
+      }
+      else if(input$dbBundesland != "Alle" && input$dbLandkreis == "Alle") {
+        data_immo_subset_db <- subset(data_immo(), grepl(input$dbBundesland, data_immo()$regio1))
+      }
+      else if(input$dbBundesland != "Alle" && input$dbLandkreis != "Alle") {
+         data_immo_subset_db <- subset(data_immo(), grepl(input$dbBundesland, data_immo()$regio1) & grepl(input$dbLandkreis, data_immo()$regio2))
+      }
+      
+      immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db))
+      print(immoDashboardStatistics())
+      
+    })
+    
     ## Tab: rpe
     ## ---------------------------------------------------------------------------------------------------------------------------------
     # Observe initial dataset
@@ -238,5 +277,37 @@ createFormula <- function(input) {
   return(formula)
 }
 
+computeDashboardStatistics <-function(immo_data) {
+  
+  dfSummaryBaseRent <- list(
+    median = median(immo_data$baseRent),
+    avg = mean(immo_data$baseRent),
+    min = min(immo_data$baseRent),
+    max = max(immo_data$baseRent),
+    q25 = quantile(immo_data$baseRent, probs = 0.25),
+    q75 = quantile(immo_data$baseRent, probs = 0.75)
+  )
+  
+  dfSummaryLivingSpace <- list(
+    median = median(immo_data$livingSpace),
+    avg = mean(immo_data$livingSpace),
+    min = min(immo_data$livingSpace),
+    max = max(immo_data$livingSpace),
+    q25 = quantile(immo_data$livingSpace, probs = 0.25),
+    q75 = quantile(immo_data$livingSpace, probs = 0.75)
+  )
+  
+  dfSummaryNoRooms <- list(
+    median = median(immo_data$noRooms),
+    avg = mean(immo_data$noRooms),
+    min = min(immo_data$noRooms),
+    max = max(immo_data$noRooms),
+    q25 = quantile(immo_data$noRooms, probs = 0.25),
+    q75 = quantile(immo_data$noRooms, probs = 0.75)
+  )
+
+  
+  return(rbind(dfSummaryBaseRent, dfSummaryLivingSpace, dfSummaryNoRooms))
+}
 
 

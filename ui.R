@@ -31,10 +31,10 @@ shinyUI(
                             box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
                                 fluidRow(
                                     column(6,
-                                           selectInput("dbBundesland", "Bundelsland", choices = c("Baden-Würrtemberg", "Nordrhein-Westfalen"))       
+                                           selectInput("dbBundesland", "Bundesland", choices = NULL)       
                                     ),
                                     column(6,
-                                           selectInput("dbLandkreis", "Landkreis", choices = c("Ostalbkreis", "Stuttgart"))
+                                           selectInput("dbLandkreis", "Landkreis", choices = NULL)
                                     )
                                 )
                             )
@@ -69,12 +69,12 @@ shinyUI(
                                          infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
                                          infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
                                          infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                         textOutput("TODO: Modus Plot")
+                                         
                                      )
                                 ),
                                 tabPanel(tagList(tags$h3("Baujahr:")),
                                      fluidRow(
-                                         textOutput("TODO: Modus Plot")
+                                         
                                      )
                                 )
                             )
