@@ -12,9 +12,8 @@ library(broom)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+
     
-    ## Tab: rpe
-    ## ---------------------------------------------------------------------------------------------------------------------------------
     # Create reactive datasets
     data_immo <- reactive(df_immo_cleaned)
     bundeslaender <- reactive(unique(sort(data_immo()$regio1)))
@@ -22,7 +21,12 @@ shinyServer(function(input, output, session) {
     typeOfFlat <- reactive(unique(sort(data_immo()$typeOfFlat)))
     heatingType <- reactive(unique(sort(data_immo()$heatingType)))
     
+    ## Tab: dashboard
+    ## ---------------------------------------------------------------------------------------------------------------------------------
     
+        
+    ## Tab: rpe
+    ## ---------------------------------------------------------------------------------------------------------------------------------
     # Observe initial dataset
     observe(priority = 100,{
       updateSelectInput(session = session, inputId = "bundesland", choices = bundeslaender())

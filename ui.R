@@ -27,8 +27,58 @@ shinyUI(
             tabItems(
                 tabItem(tabName = "dashBoard",
                     fluidRow(
-                        box(title = "Durchschnittsmiete pro Bundesland und Datum", "TODO"
-                        )        
+                        column(6,
+                            box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
+                                fluidRow(
+                                    column(6,
+                                           selectInput("dbBundesland", "Bundelsland", choices = c("Baden-Würrtemberg", "Nordrhein-Westfalen"))       
+                                    ),
+                                    column(6,
+                                           selectInput("dbLandkreis", "Landkreis", choices = c("Ostalbkreis", "Stuttgart"))
+                                    )
+                                )
+                            )
+                        ),
+                    ),
+                    fluidRow(
+                        column(12,
+                            tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL,
+                                tabPanel(tagList(tags$h3("Kaltmiete:")),
+                                    fluidRow(
+                                        infoBox(title = "Arithmetisches Mittel", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = ".25-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = ".75-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE)
+                                    )
+                                ),
+                                tabPanel(tagList(tags$h3("Wohnfläche:")),
+                                    fluidRow(
+                                        infoBox(title = "Arithmetisches Mittel", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = ".25-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                        infoBox(title = ".75-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE)
+                                    )
+                                ),
+                                tabPanel(tagList(tags$h3("Anzahl Zimmer:")),
+                                     fluidRow(
+                                         infoBox(title = "Arithmetisches Mittel", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                         infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                         infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                         infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
+                                         textOutput("TODO: Modus Plot")
+                                     )
+                                ),
+                                tabPanel(tagList(tags$h3("Baujahr:")),
+                                     fluidRow(
+                                         textOutput("TODO: Modus Plot")
+                                     )
+                                )
+                            )
+                        )    
                     )
                 ),
                 tabItem(tabName = "baseData",
