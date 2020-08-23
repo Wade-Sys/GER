@@ -6,9 +6,13 @@ library(shinyjs)
 library(DT)
 library(ggplot2)
 library(broom)
-#library(car)
+library(maps)
+library(mapdata)
+library(rgdal)
+library(sp)
 
-#df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
+
+df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -126,16 +130,22 @@ shinyServer(function(input, output, session) {
         infoBox(title = ".75-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q75"], icon = icon("credit-card"), fill = TRUE)
       })
       
-      # Render Plot NoRooms
-      # output$dbPlotHistNoRooms <- renderPlot({
-      #  
-      # })
-      
-      
-      # Render Plot NoRooms
-      # output$dbPlotHistYearConstructed <- renderPlot({
-      # 
-      # })
+      # Render Plot Deutschlandkarte
+      output$dbPlotMapGermany <- renderPlot({
+        filePath <- paste0(getwd(),"/geodata/vg2500")
+        gerKrsMap <- readOGR(dsn=filePath, layer="vg2500_krs")
+        gerLanMap <- readOGR(dsn=filePath, layer="vg2500_lan")
+        
+        ggplot() +
+          geom_polygon(data = tidy(gerLanMap), aes( x = long, y = lat, group = group), fill="#69b3a2", color="white") +
+          theme_void()
+        
+        
+        #plot(gerMap, col="#f2f2f2", lwd=1, border=0, )
+        #map("world", region="germany", fill=TRUE, col="grey")
+        
+        
+      })
       
     })
     

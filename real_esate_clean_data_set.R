@@ -39,7 +39,7 @@ telekomTvOffer
 ### Bereinigung von Datensaetzen
 df_clean_na <- na.omit(df_clean_cols) # NAs
 
-write.csv2(df_clean_na, file = "data/immo_scout_cleaned_cols_no_na.csv") # Zwischenspeichern
+write.csv2(df_clean_na, file = "data/immo_scout_cleaned_cols_no_na.csv",row.names = FALSE) # Zwischenspeichern
 
 df_clean_1 <- subset(df_clean_na, floor < 64) # Hoechste Gebaude in DE hat 63 Stockwerke
 df_clean_2 <- subset(df_clean_1, noRooms > 0) # Es muss mindesten ein Zimmer vorhanden sein
@@ -55,9 +55,8 @@ rm(list = c("df_clean_1","df_clean_2","df_clean_3","df_clean_4","df_clean_5","df
 
 
 # Finales Dataset speichern
-write.csv2(df_immo_cleaned, file = "GER/immo_scout_cleaned_final.csv")
-write.csv2(df_immo_cleaned, file = "data/immo_scout_cleaned_final.csv")
-
+write.csv2(df_immo_cleaned, file = "GER/immo_scout_cleaned_final.csv", row.names = FALSE)
+write.csv2(df_immo_cleaned, file = "data/immo_scout_cleaned_final.csv", row.names = FALSE)
 
 # df_immo_cl_reduced <- subset(df_immo_cleaned, select = c(
 # serviceCharge

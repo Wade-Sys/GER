@@ -6,6 +6,8 @@ library(shinyjs)
 library(DT)
 library(ggplot2)
 library(tidyverse)
+library(maps)
+library(mapdata)
 
 # Helper functions
 
@@ -28,21 +30,7 @@ shinyUI(
                 tabItem(tabName = "dashBoard",
                     fluidRow(
                         column(6,
-                            box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
-                                fluidRow(
-                                    column(6,
-                                           selectInput("dbBundesland", "Bundesland", choices = NULL)       
-                                    ),
-                                    column(6,
-                                           selectInput("dbLandkreis", "Landkreis", choices = NULL)
-                                    )
-                                )
-                            )
-                        ),
-                    ),
-                    fluidRow(
-                        column(12,
-                            tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL,
+                            tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL, height = "100%",
                                 tabPanel(tagList(tags$h3("Kaltmiete:")),
                                     fluidRow(
                                         infoBoxOutput("dbInfoBoxBaseRentAvg"),
@@ -77,13 +65,23 @@ shinyUI(
                                      )
                                      
                                 )
-                                #tabPanel(tagList(tags$h3("Baujahr:")),
-                                #     fluidRow(
-                                #         plotOutput("dbPlotHistYearConstructed") 
-                                #     )
-                                #)
                             )
-                        )    
+                        ),
+                        column(6,
+                           box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
+                               fluidRow(
+                                   column(6,
+                                          selectInput("dbBundesland", "Bundesland", choices = NULL)       
+                                   ),
+                                   column(6,
+                                          selectInput("dbLandkreis", "Landkreis", choices = NULL)
+                                   )
+                               ),
+                               fluidRow(
+                                   column(12,plotOutput("dbPlotMapGermany",height = 1000)),
+                               )
+                           )
+                        )
                     )
                 ),
                 tabItem(tabName = "baseData",
