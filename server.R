@@ -23,7 +23,7 @@ shinyServer(function(input, output, session) {
     
     ## Tab: dashboard
     ## ---------------------------------------------------------------------------------------------------------------------------------
-    
+   
     # Observe Bundesland
     observe(priority = 100, {
       updateSelectInput(session = session, inputId = "dbBundesland", choices = c("Alle",bundeslaender()))
@@ -60,9 +60,89 @@ shinyServer(function(input, output, session) {
       }
       
       immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db))
-      print(immoDashboardStatistics())
+      #print(immoDashboardStatistics())
+      
+      
+      # Render Dasboard info boxes:
+      ## BaseRent
+      output$dbInfoBoxBaseRentAvg <- renderInfoBox({
+        infoBox(title = "Arithmetisches Mittel", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","avg"], " €"), icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxBaseRentMedian <- renderInfoBox({
+        infoBox(title = "Median", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","median"], " €"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxBaseRentMin <- renderInfoBox({
+        infoBox(title = "Min-Wert", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","min"], " €"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxBaseRentMax <- renderInfoBox({
+        infoBox(title = "Max-Wert", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","max"], " €"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxBaseRentQ25 <- renderInfoBox({
+        infoBox(title = ".25-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","q25"], " €"), icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxBaseRentQ75 <- renderInfoBox({
+        infoBox(title = ".75-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","q75"], " €"), icon = icon("credit-card"), fill = TRUE)
+      })
+      
+      # Render Dasboard info boxes:
+      ## LivingSpace
+      output$dbInfoBoxLivingSpaceAvg <- renderInfoBox({
+        infoBox(title = "Arithmetisches Mittel", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","avg"], " qm"), icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxLivingSpaceMedian <- renderInfoBox({
+        infoBox(title = "Median", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","median"], " qm"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxLivingSpaceMin <- renderInfoBox({
+        infoBox(title = "Min-Wert", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","min"], " qm"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxLivingSpaceMax <- renderInfoBox({
+        infoBox(title = "Max-Wert", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","max"], " qm"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxLivingSpaceQ25 <- renderInfoBox({
+        infoBox(title = ".25-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","q25"], " qm"),icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxLivingSpaceQ75 <- renderInfoBox({
+        infoBox(title = ".75-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","q75"], " qm"),icon = icon("credit-card"), fill = TRUE)
+      })
+      
+      # Render Dasboard info boxes:
+      ## NoRooms
+      output$dbInfoBoxNoRoomsAvg <- renderInfoBox({
+        infoBox(title = "Arithmetisches Mittel", value = immoDashboardStatistics()["dfSummaryNoRooms","avg"], icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxNoRoomsMedian <- renderInfoBox({
+        infoBox(title = "Median", value = immoDashboardStatistics()["dfSummaryNoRooms","median"], icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxNoRoomsMin <- renderInfoBox({
+        infoBox(title = "Min-Wert", value = immoDashboardStatistics()["dfSummaryNoRooms","min"], icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxNoRoomsMax <- renderInfoBox({
+        infoBox(title = "Max-Wert", value = immoDashboardStatistics()["dfSummaryNoRooms","max"], icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxNoRoomsQ25 <- renderInfoBox({
+        infoBox(title = ".25-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q25"], icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbInfoBoxNoRoomsQ75 <- renderInfoBox({
+        infoBox(title = ".75-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q75"], icon = icon("credit-card"), fill = TRUE)
+      })
+      
+      # Render Plot NoRooms
+      # output$dbPlotHistNoRooms <- renderPlot({
+      #  
+      # })
+      
+      
+      # Render Plot NoRooms
+      # output$dbPlotHistYearConstructed <- renderPlot({
+      # 
+      # })
       
     })
+    
+    observe(priority = 100, {
+      
+    })
+    
     
     ## Tab: rpe
     ## ---------------------------------------------------------------------------------------------------------------------------------
@@ -280,30 +360,30 @@ createFormula <- function(input) {
 computeDashboardStatistics <-function(immo_data) {
   
   dfSummaryBaseRent <- list(
-    median = median(immo_data$baseRent),
-    avg = mean(immo_data$baseRent),
-    min = min(immo_data$baseRent),
-    max = max(immo_data$baseRent),
-    q25 = quantile(immo_data$baseRent, probs = 0.25),
-    q75 = quantile(immo_data$baseRent, probs = 0.75)
+    median = round(median(immo_data$baseRent),2),
+    avg = round(mean(immo_data$baseRent),2),
+    min = round(min(immo_data$baseRent),2),
+    max = round(max(immo_data$baseRent),2),
+    q25 = round(unname(quantile(immo_data$baseRent, probs = 0.25),2)),
+    q75 = round(unname(quantile(immo_data$baseRent, probs = 0.75),2))
   )
   
   dfSummaryLivingSpace <- list(
-    median = median(immo_data$livingSpace),
-    avg = mean(immo_data$livingSpace),
-    min = min(immo_data$livingSpace),
-    max = max(immo_data$livingSpace),
-    q25 = quantile(immo_data$livingSpace, probs = 0.25),
-    q75 = quantile(immo_data$livingSpace, probs = 0.75)
+    median = round(median(immo_data$livingSpace),2),
+    avg = round(mean(immo_data$livingSpace),2),
+    min = round(min(immo_data$livingSpace),2),
+    max = round(max(immo_data$livingSpace),2),
+    q25 = round(unname(quantile(immo_data$livingSpace, probs = 0.25),2)),
+    q75 = round(unname(quantile(immo_data$livingSpace, probs = 0.75),2))
   )
   
   dfSummaryNoRooms <- list(
-    median = median(immo_data$noRooms),
-    avg = mean(immo_data$noRooms),
-    min = min(immo_data$noRooms),
-    max = max(immo_data$noRooms),
-    q25 = quantile(immo_data$noRooms, probs = 0.25),
-    q75 = quantile(immo_data$noRooms, probs = 0.75)
+    median = round(median(immo_data$noRooms),2),
+    avg = round(mean(immo_data$noRooms),2),
+    min = round(min(immo_data$noRooms),2),
+    max = round(max(immo_data$noRooms),2),
+    q25 = round(unname(quantile(immo_data$noRooms, probs = 0.25),2)),
+    q75 = round(unname(quantile(immo_data$noRooms, probs = 0.75),2))
   )
 
   

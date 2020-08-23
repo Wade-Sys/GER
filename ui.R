@@ -45,38 +45,43 @@ shinyUI(
                             tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL,
                                 tabPanel(tagList(tags$h3("Kaltmiete:")),
                                     fluidRow(
-                                        infoBox(title = "Arithmetisches Mittel", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = ".25-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = ".75-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE)
+                                        infoBoxOutput("dbInfoBoxBaseRentAvg"),
+                                        infoBoxOutput("dbInfoBoxBaseRentMedian"),
+                                        infoBoxOutput("dbInfoBoxBaseRentMin"),
+                                        infoBoxOutput("dbInfoBoxBaseRentMax"),
+                                        infoBoxOutput("dbInfoBoxBaseRentQ25"),
+                                        infoBoxOutput("dbInfoBoxBaseRentQ75")
                                     )
                                 ),
                                 tabPanel(tagList(tags$h3("Wohnfläche:")),
                                     fluidRow(
-                                        infoBox(title = "Arithmetisches Mittel", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = ".25-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                        infoBox(title = ".75-Quantil", value = 0, icon = icon("credit-card"), fill = TRUE)
+                                        infoBoxOutput("dbInfoBoxLivingSpaceAvg"),
+                                        infoBoxOutput("dbInfoBoxLivingSpaceMedian"),
+                                        infoBoxOutput("dbInfoBoxLivingSpaceMin"),
+                                        infoBoxOutput("dbInfoBoxLivingSpaceMax"),
+                                        infoBoxOutput("dbInfoBoxLivingSpaceQ25"),
+                                        infoBoxOutput("dbInfoBoxLivingSpaceQ75")
                                     )
                                 ),
                                 tabPanel(tagList(tags$h3("Anzahl Zimmer:")),
                                      fluidRow(
-                                         infoBox(title = "Arithmetisches Mittel", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                         infoBox(title = "Median", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                         infoBox(title = "Min-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                         infoBox(title = "Max-Wert", value = 0, icon = icon("credit-card"), fill = TRUE),
-                                         
-                                     )
-                                ),
-                                tabPanel(tagList(tags$h3("Baujahr:")),
+                                         infoBoxOutput("dbInfoBoxNoRoomsAvg"),
+                                         infoBoxOutput("dbInfoBoxNoRoomsMedian"),
+                                         infoBoxOutput("dbInfoBoxNoRoomsMin"),
+                                         infoBoxOutput("dbInfoBoxNoRoomsMax"),
+                                         infoBoxOutput("dbInfoBoxNoRoomsQ25"),
+                                         infoBoxOutput("dbInfoBoxNoRoomsQ75")
+                                     ),
                                      fluidRow(
-                                         
+                                         #plotOutput("dbPlotHistNoRooms")
                                      )
+                                     
                                 )
+                                #tabPanel(tagList(tags$h3("Baujahr:")),
+                                #     fluidRow(
+                                #         plotOutput("dbPlotHistYearConstructed") 
+                                #     )
+                                #)
                             )
                         )    
                     )
