@@ -80,3 +80,23 @@ write.csv2(df_immo_cleaned, file = "data/immo_scout_cleaned_final.csv", row.name
 
 ## Test
 #fitEstateAll_i <- lm(df_immo_cleaned, formula = baseRent ~ (regio1 * regio2) +(livingSpace * yearConstructed * noRooms * floor) +heatingType + balcony  + hasKitchen + cellar + lift + typeOfFlat +  garden)
+
+## Prepare geodata
+
+filePath <- paste0(getwd(),"/GER/geodata/vg2500")
+gerKrsMap <- readOGR(dsn=filePath, layer="vg2500_krs")
+gerLanMap <- readOGR(dsn=filePath, layer="vg2500_lan")
+
+gerKrsWithId <- data.frame(c(seq(0,400)),gerKrsMap@data[["GEN"]])
+gerLanWithId <- data.frame(c(seq(0,15)),gerLanMap@data[["GEN"]])
+
+names(gerKrsWithId) <- c("id", "landkreis")
+names(gerLanWithId) <- c("id", "bundesland")
+
+mapLandkreis <- merge(x=tidy(gerKrsMap), y=gerKrsWithId, by="id")
+mapBundesland <- merge(x=tidy(gerLanMap), y=gerLanWithId, by="id")
+
+write.csv2(mapLandkreis, file = "GER/geo_landkreis.csv", row.names = FALSE)
+write.csv2(mapBundesland, file = "GER/geo_bundesland.csv", row.names = FALSE)
+
+rm(list = c("filePath", "gerKrsMap","gerLanMap","gerKrsWithId","gerLanWithId","mapLandkreis","mapBundesland"))

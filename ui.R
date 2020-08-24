@@ -6,8 +6,14 @@ library(shinyjs)
 library(DT)
 library(ggplot2)
 library(tidyverse)
+library(broom)
 library(maps)
 library(mapdata)
+library(rgdal)
+library(sp)
+#library(leaflet)
+library(mapproj)
+
 
 # Helper functions
 
@@ -79,6 +85,7 @@ shinyUI(
                                ),
                                fluidRow(
                                    column(12,plotOutput("dbPlotMapGermany",height = 1000)),
+                                   #column(12,leafletOutput("dbPlotMapGermany"))
                                )
                            )
                         )

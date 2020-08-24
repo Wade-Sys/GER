@@ -5,14 +5,18 @@ library(shinyWidgets)
 library(shinyjs)
 library(DT)
 library(ggplot2)
+library(tidyverse)
 library(broom)
 library(maps)
 library(mapdata)
 library(rgdal)
 library(sp)
+#library(leaflet)
+library(mapproj)
 
-
-df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
+#df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
+dfBundesland <- read_csv2(file = "geo_bundesland.csv")
+dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -130,27 +134,20 @@ shinyServer(function(input, output, session) {
         infoBox(title = ".75-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q75"], icon = icon("credit-card"), fill = TRUE)
       })
       
-      # Render Plot Deutschlandkarte
-      output$dbPlotMapGermany <- renderPlot({
-        filePath <- paste0(getwd(),"/geodata/vg2500")
-        gerKrsMap <- readOGR(dsn=filePath, layer="vg2500_krs")
-        gerLanMap <- readOGR(dsn=filePath, layer="vg2500_lan")
-        
-        ggplot() +
-          geom_polygon(data = tidy(gerLanMap), aes( x = long, y = lat, group = group), fill="#69b3a2", color="white") +
-          theme_void()
-        
-        
-        #plot(gerMap, col="#f2f2f2", lwd=1, border=0, )
-        #map("world", region="germany", fill=TRUE, col="grey")
-        
-        
-      })
-      
     })
     
     observe(priority = 100, {
-      
+      output$dbPlotMapGermany <- renderPlot({
+        
+        # ggplot() +  geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#59b2a3", color="black") + theme_void() +
+        #   #geom_polygon(data = tidy(gerKrsMap), aes( x = long, y = lat, group = group), fill="red", color="grey") + theme_void()
+        #   geom_polygon(data = subset(dfBundesland, id == 6), aes( x = long, y = lat, group = group, fill = "red"), color="grey") + theme(legend.position = "none")
+        #
+        ggplot() +  geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#59b2a3", color="black") + theme_void() +
+          #geom_polygon(data = tidy(gerKrsMap), aes( x = long, y = lat, group = group), fill="red", color="grey") + theme_void()
+          geom_polygon(data = subset(dfLandkreis, landkreis =="Ostalbkreis"), aes( x = long, y = lat, group = group, fill = "red"), color="grey") + theme(legend.position = "none")
+        
+      })
     })
     
     
