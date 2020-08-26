@@ -36,6 +36,8 @@ telekomTvOffer
 ,geo_krs
 ))
 
+#drop raw
+rm(list = c("df_raw"))
 ### Bereinigung von Datensaetzen
 df_clean_na <- na.omit(df_clean_cols) # NAs
 
@@ -47,40 +49,60 @@ df_clean_3 <- subset(df_clean_2, livingSpace > 0) # Wohnflaeche muss gueltig sei
 df_clean_4 <- subset(df_clean_3, yearConstructed > 1214) # Das aelteste Haus in DE ist 1215
 df_clean_4 <- subset(df_clean_4, yearConstructed < 2021) # Erhebung war in 2018 und 2019. Vielleicht wurden Wohnung angeboten die in 2020 fertigstellt werden
 df_clean_5 <- subset(df_clean_4, baseRent > 0) # Miete muss groesser 0 sein
+df_clean_5 <- subset(df_clean_5, baseRent != 999) # unplasible Werte
+df_clean_5 <- subset(df_clean_5, baseRent != 9999) # unplasible Werte
+df_clean_5 <- subset(df_clean_5, baseRent != 99999) # unplasible Werte
 df_clean_6 <- subset(df_clean_5, serviceCharge > 0) # Nebenkosten muessen groeßer sein
 df_clean_7 <- subset(df_clean_6, serviceCharge != baseRent) # Nebenkosten und Miete duerfen nicht gleich sein
-df_immo_cleaned <- df_clean_7
+# Unterstriche durch Leerzeichen ersetzen
+df_clean_8 <- df_clean_7
+df_clean_8$regio1 <- str_replace_all(df_clean_8$regio1,"_","-")
+df_clean_8$regio2 <- str_replace_all(df_clean_8$regio2,"_","-")
+df_clean_8$regio3 <- str_replace_all(df_clean_8$regio3,"_"," ")
+df_clean_8$heatingType <- str_replace_all(df_clean_8$heatingType,"_"," ")
+df_clean_8$typeOfFlat <- str_replace_all(df_clean_8$typeOfFlat,"_"," ")
+# Spalten uebersetzen: Heizungsart
+df_clean_9 <- df_clean_8
+  df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"self contained central heating","autonome Zentralheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"central heating","Zentralheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"floor heating","Fußbodenheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"district heating","Fernwärme")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"oil heating","Ölheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"gas heating","Gasheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"electric heating","elektrische Heizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"combined heat and power plant","Kraft-Wärme-Kopplungsanlage")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"heat pump","Wärmepumpe")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"night storage heater","Nachtspeicherheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"wood pellet heating","Holzpellet-Heizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"stove heating","Ofenheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"solar heating","Solarheizung")
+# Spalten uebersetzen: Wohnungstyp
+df_clean_10 <- df_clean_9
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"raised ground floor","Hochparterre")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"ground floor","Erdgeschoss")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"apartment","Wohnung")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"other","sonstige")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"roof storey","Dachgeschoss")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"terraced flat","Terrassenwohnung")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"maisonette","Maisonette")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"penthouse","Penthouse")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"half basement","Souterrain")
+df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"loft","Loft")
+# Landkreise bereinigen
+df_clean_11 <- df_clean_10
+# Endgueltiger Datensatz
+df_immo_cleaned <- df_clean_11
 
-rm(list = c("df_clean_1","df_clean_2","df_clean_3","df_clean_4","df_clean_5","df_clean_6","df_clean_7","df_clean_na","df_clean_cols"))
+#clean data
+rm(list = c("df_clean_1","df_clean_2","df_clean_3","df_clean_4","df_clean_5","df_clean_6","df_clean_7","df_clean_8","df_clean_9", "df_clean_10","df_clean_11",
+            "df_clean_na","df_clean_cols"))
 
 
 # Finales Dataset speichern
 write.csv2(df_immo_cleaned, file = "GER/immo_scout_cleaned_final.csv", row.names = FALSE)
 write.csv2(df_immo_cleaned, file = "data/immo_scout_cleaned_final.csv", row.names = FALSE)
 
-# df_immo_cl_reduced <- subset(df_immo_cleaned, select = c(
-# serviceCharge
-# ,baseRent
-# ,livingSpace
-# ,noRooms
-# ,floor
-# ,yearConstructed
-# ))
-# 
-# 
-# df_cor_test <- subset(df_immo_cleaned, grepl("Berlin", df_immo_cleaned[['regio1']]), select = c(
-#   serviceCharge
-#   ,baseRent
-#   ,livingSpace
-#   ,noRooms
-#   ,floor
-#   ,yearConstructed
-# ))
-
-
-## Test
-#fitEstateAll_i <- lm(df_immo_cleaned, formula = baseRent ~ (regio1 * regio2) +(livingSpace * yearConstructed * noRooms * floor) +heatingType + balcony  + hasKitchen + cellar + lift + typeOfFlat +  garden)
-
+## -------------------------------------------------------------------------------------------------------------------------------------------------
 ## Prepare geodata
 
 filePath <- paste0(getwd(),"/GER/geodata/vg2500")
@@ -99,4 +121,4 @@ mapBundesland <- merge(x=tidy(gerLanMap), y=gerLanWithId, by="id")
 write.csv2(mapLandkreis, file = "GER/geo_landkreis.csv", row.names = FALSE)
 write.csv2(mapBundesland, file = "GER/geo_bundesland.csv", row.names = FALSE)
 
-rm(list = c("filePath", "gerKrsMap","gerLanMap","gerKrsWithId","gerLanWithId","mapLandkreis","mapBundesland"))
+rm(list = c("filePath", "gerKrsMap","gerLanMap","gerKrsWithId","gerLanWithId"))#,"mapLandkreis","mapBundesland"))
