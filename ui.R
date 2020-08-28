@@ -3,6 +3,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyjs)
+library(dashboardthemes)
 library(DT)
 library(ggplot2)
 library(tidyverse)
@@ -11,7 +12,6 @@ library(maps)
 library(mapdata)
 library(rgdal)
 library(sp)
-#library(leaflet)
 library(mapproj)
 
 
@@ -32,6 +32,9 @@ shinyUI(
         ),
         dashboardBody(
             useShinyjs(),
+            shinyDashboardThemes(
+                theme = "blue_gradient"
+            ),
             tabItems(
                 tabItem(tabName = "dashBoard",
                     fluidRow(
@@ -92,7 +95,13 @@ shinyUI(
                     )
                 ),
                 tabItem(tabName = "baseData",
-                        fluidRow(column(12, dataTableOutput("data_table")))
+                    fluidRow(
+                        column(12, 
+                            box(width = NULL, solidHeader = TRUE, status = "primary", title = tags$h3("Der Inhalt des verwendeten Datensatzes in Tabellenform:"),
+                                dataTableOutput("data_table")    
+                            )
+                        )
+                    )
                 ),
                 tabItem(tabName = "rpe",
                     fluidRow(

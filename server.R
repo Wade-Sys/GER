@@ -3,6 +3,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyjs)
+library(dashboardthemes)
 library(DT)
 library(ggplot2)
 library(tidyverse)
@@ -11,7 +12,6 @@ library(maps)
 library(mapdata)
 library(rgdal)
 library(sp)
-#library(leaflet)
 library(mapproj)
 
 #df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
@@ -337,7 +337,10 @@ shinyServer(function(input, output, session) {
     ## ---------------------------------------------------------------------------------------------------------------------------------
     ## Tab: baseData
     # Datetable for data overview
-    output$data_table <- DT::renderDataTable(data_immo(), options = list(scrollX = TRUE),filter = 'top', server = TRUE)
+    output$data_table <- DT::renderDataTable(data_immo(), options = list(scrollX = TRUE), class = 'table-bordered table-striped',
+      filter = 'top', server = TRUE, style = "bootstrap", rownames = FALSE, selection = "none",
+      colnames = c("Bundesland","Nebenkosten","Heizungsart","Balkon","Baujahr","Küche","Keller","Kaltmiete","Wohnfläche","Aufzug","Wohnungstyp","PLZ","Zimmeranzahl","Stockwerk","Garten","Landkreis")
+    )
 
 })
 ###### Helper functions
