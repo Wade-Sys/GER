@@ -60,6 +60,7 @@ shinyServer(function(input, output, session) {
       
       greplInputBundesland <- paste0('^',input$dbBundesland,'$')
       greplInputLandkreis <- paste0('^',input$dbLandkreis,'$')
+      greplInputLandkreis <- str_replace_all(str_replace_all(greplInputLandkreis,"\\(","\\\\("),"\\)","\\\\)") # Klammer muessen fuer die Suche ersetzt werden
       
       # Subset data by Bundesland and Landkreis for computation
       if((input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") || (input$dbBundesland == "" && input$dbLandkreis == "")){
@@ -68,7 +69,9 @@ shinyServer(function(input, output, session) {
       }
       else if(input$dbBundesland == "Alle" && input$dbLandkreis != "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(greplInputLandkreis, data_immo()$regio2))
-        mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, grepl(greplInputLandkreis,dfLandkreis$landkreis)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+        mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, 
+                                grepl(greplInputLandkreis,dfLandkreis$landkreis)), 
+                                aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis == "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1))
