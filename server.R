@@ -14,9 +14,9 @@ library(rgdal)
 library(sp)
 library(mapproj)
 
-#df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
-#dfBundesland <- read_csv2(file = "geo_bundesland.csv")
-#dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
+df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
+dfBundesland <- read_csv2(file = "geo_bundesland.csv")
+dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
 
 dfBundesland <- mapBundesland
 dfLandkreis <- mapLandkreis
@@ -33,6 +33,13 @@ shinyServer(function(input, output, session) {
     data_immo_subset_db <- reactive(0)
     immoDashboardStatistics <- reactive(0)
     mapGerman <- ggplot() + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
+    # Replace TRUE/FALSE for Datatable
+    exploreImmoDataTable <- df_immo_cleaned
+    exploreImmoDataTable$balcony <- ifelse(exploreImmoDataTable$balcony == TRUE, "Ja", "Nein")
+    exploreImmoDataTable$cellar <- ifelse(exploreImmoDataTable$cellar == TRUE, "Ja", "Nein")
+    exploreImmoDataTable$lift <- ifelse(exploreImmoDataTable$lift == TRUE, "Ja", "Nein")
+    exploreImmoDataTable$hasKitchen <- ifelse(exploreImmoDataTable$hasKitchen == TRUE, "Ja", "Nein")
+    exploreImmoDataTable$garden <- ifelse(exploreImmoDataTable$garden == TRUE, "Ja", "Nein")
     
     ## Tab: dashboard
     ## ---------------------------------------------------------------------------------------------------------------------------------
@@ -337,8 +344,10 @@ shinyServer(function(input, output, session) {
     ## ---------------------------------------------------------------------------------------------------------------------------------
     ## Tab: baseData
     # Datetable for data overview
+  
+    
     output$data_table <- DT::renderDataTable(
-      datatable(data_immo(), 
+      datatable(exploreImmoDataTable, 
         options = list(
           scrollX = TRUE,
           language = list(
@@ -346,12 +355,13 @@ shinyServer(function(input, output, session) {
             paginate = list(previous = 'Zurück', `next` = 'Vor'),
             lengthMenu = '_MENU_ Einträge pro Seite',
             search = 'Suche:',
-            thousands = '.'
+            thousands = '.',
+            zeroRecords = 'Keine Daten gefunden'
           )
         ), 
-        filter = 'top',  class = 'table-bordered table-striped',  rownames = FALSE, selection = "none",
+        filter = 'top',  class = 'table-bordered table-striped',  rownames = FALSE, selection = "none", style = 'bootstrap4',
         colnames = c("Bundesland","Nebenkosten","Heizungsart","Balkon","Baujahr","Küche","Keller","Kaltmiete","Wohnfläche","Aufzug","Wohnungstyp","PLZ","Zimmeranzahl","Stockwerk","Garten","Landkreis")
-      ) %>% formatCurrency(c(2,8), '\U20AC', digits = 2, before = FALSE) %>% formatCurrency(9, 'qm', digits = 2, before = FALSE) %>% formatStyle()
+      ) %>% formatCurrency(c(2,8), '\U20AC', digits = 2, before = FALSE) %>% formatCurrency(9, 'qm', digits = 2, before = FALSE) 
     ) 
 
 })
