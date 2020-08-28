@@ -1,4 +1,7 @@
-#library(tidyverse)
+library(tidyverse)
+library(broom)
+library(rgdal)
+library(sp)
 df_raw <- read_csv("data/immo_data.csv")
 
 # Nicht benotigte Spalte entfernen
@@ -34,6 +37,8 @@ telekomTvOffer
 ,totalRent
 ,geo_bln
 ,geo_krs
+,regio3
+,date
 ))
 
 #drop raw
@@ -63,7 +68,7 @@ df_clean_8$heatingType <- str_replace_all(df_clean_8$heatingType,"_"," ")
 df_clean_8$typeOfFlat <- str_replace_all(df_clean_8$typeOfFlat,"_"," ")
 # Spalten uebersetzen: Heizungsart
 df_clean_9 <- df_clean_8
-  df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"self contained central heating","autonome Zentralheizung")
+df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"self contained central heating","autonome Zentralheizung")
 df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"central heating","Zentralheizung")
 df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"floor heating","Fußbodenheizung")
 df_clean_9$heatingType <- str_replace_all(df_clean_9$heatingType,"district heating","Fernwärme")
@@ -90,6 +95,7 @@ df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"half basement"
 df_clean_10$typeOfFlat <- str_replace_all(df_clean_10$typeOfFlat,"loft","Loft")
 # Landkreise bereinigen
 df_clean_11 <- df_clean_10
+# ACHTUNG BIS HIER HER AUSUEHREN UND DANN das landkreise_cleaning.R ausfuehren und dann weiter
 # Endgueltiger Datensatz
 df_immo_cleaned <- df_clean_11
 
