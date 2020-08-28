@@ -48,7 +48,7 @@ shinyServer(function(input, output, session) {
         dbLkSelected <- subset(landkreiseAll(), select = c("regio2"))
         
       } else {
-        dbLkSelected <- subset(landkreiseAll(), grepl(input$dbBundesland, landkreiseAll()$regio1),select = c("regio2"))
+        dbLkSelected <- subset(landkreiseAll(), grepl(paste0('^',input$dbBundesland,'$'), landkreiseAll()$regio1),select = c("regio2"))
       }
       
       updateSelectInput(session = session, inputId = "dbLandkreis", choices = c("Alle",sort(unique(dbLkSelected$regio2))))
@@ -58,22 +58,29 @@ shinyServer(function(input, output, session) {
     # Observe values
     observe(priority = 100, {
       
+      greplInputBundesland <- paste0('^',input$dbBundesland,'$')
+      greplInputLandkreis <- paste0('^',input$dbLandkreis,'$')
+      
       # Subset data by Bundesland and Landkreis for computation
       if((input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") || (input$dbBundesland == "" && input$dbLandkreis == "")){
         data_immo_subset_db <- data_immo()
         mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
       }
       else if(input$dbBundesland == "Alle" && input$dbLandkreis != "Alle") {
-        data_immo_subset_db <- subset(data_immo(), grepl(input$dbLandkreis, data_immo()$regio2))
-        mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, grepl(input$dbLandkreis,dfLandkreis$landkreis)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+        data_immo_subset_db <- subset(data_immo(), grepl(greplInputLandkreis, data_immo()$regio2))
+        mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, grepl(greplInputLandkreis,dfLandkreis$landkreis)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis == "Alle") {
-        data_immo_subset_db <- subset(data_immo(), grepl(input$dbBundesland, data_immo()$regio1))
-        mapGerman <- mapGerman + geom_polygon(data = subset(dfBundesland, grepl(input$dbBundesland,dfBundesland$bundesland)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+        data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1))
+        mapGerman <- mapGerman + geom_polygon(data = subset(dfBundesland, 
+                                grepl(greplInputBundesland,dfBundesland$bundesland)), 
+                                aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis != "Alle") {
-         data_immo_subset_db <- subset(data_immo(), grepl(input$dbBundesland, data_immo()$regio1) & grepl(input$dbLandkreis, data_immo()$regio2))
-         mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, grepl(input$dbLandkreis,dfLandkreis$landkreis)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+         data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1) & grepl(greplInputLandkreis, data_immo()$regio2))
+         mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, 
+                                grepl(greplInputLandkreis,dfLandkreis$landkreis)), 
+                                aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
       }
       else {
         mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
@@ -223,7 +230,7 @@ shinyServer(function(input, output, session) {
     observe(priority = 100, {
       # Filter dataset for landkreise
       if(input$switchBL) {
-        landkreiseSelected <- subset(landkreiseAll(), grepl(input$bundesland, landkreiseAll()$regio1),select = c("regio2"))
+        landkreiseSelected <- subset(landkreiseAll(), grepl(paste0('^',input$bundesland,'$'), landkreiseAll()$regio1),select = c("regio2"))
         updateSelectInput(session = session, inputId = "landkreis", choices = sort(unique(landkreiseSelected$regio2)))
       }
       else {
@@ -233,15 +240,40 @@ shinyServer(function(input, output, session) {
     
     ## ObserveEvent: getPrice
     observeEvent(input$getPrice,{
-      lmFormula <- createFormula(input)
+      lmFormula <- createFormula(input,ignore = NA)
       dfDatasetToPredict <- createFeatureDF(input)
+      data_immo_subset <- 0
       if(lmFormula == 0) {
         predictEstate <- 0
       }
       else {
         withProgress(message = "Mietpreis wird geschätzt...", value = 0, min =0, max = 100, {
           incProgress(amount = 25, message = paste("Modell wird berechnet..."))
-          fitEstate <- lm(data_immo(), formula = lmFormula)
+          # Subselect data by regio1 and regio2
+          
+          
+          if(input$switchBL == TRUE && input$switchLK == TRUE) {
+            data_immo_subset <- subset(data_immo(), grepl(paste0('^',input$bundesland,'$'),data_immo()$regio1) & grepl(paste0('^',input$landkreis,'$'),data_immo()$regio2), select = -c(regio1,regio2))
+            lmFormula <- createFormula(input,c("regio1","regio2"))
+          }
+          else if(input$switchBL == TRUE && input$switchLK == FALSE) {
+            data_immo_subset <- subset(data_immo(), grepl(paste0('^',input$bundesland,'$'),data_immo()$regio1), select = -c(regio1))
+            lmFormula <- createFormula(input,c("regio1"))
+          }
+          else if(input$switchBL == FALSE && input$switchLK == TRUE) {
+            data_immo_subset <- subset(data_immo(), grepl(paste0('^',input$landkreis,'$'),data_immo()$regio2), select = -c(regio2))
+            lmFormula <- createFormula(input,c("regio2"))
+          } 
+          else {
+            data_immo_subset <- data_immo()
+            lmFormula <- createFormula(input, ignore = NA)
+          }
+          
+          #print(data_immo_subset)
+          
+          
+          
+          fitEstate <- lm(data_immo_subset, formula = lmFormula)
           incProgress(amount = 50, message = paste("Mietpreis wird geschäzt..."))
           predictEstate <- predict(object = fitEstate, dfDatasetToPredict)
         
@@ -254,7 +286,7 @@ shinyServer(function(input, output, session) {
           incProgress(amount = 75, message = paste("Angaben zum Modell werden ermittelt..."))
           
           fitEstateSummary <- summary(fitEstate)
-          print(fitEstateSummary)
+          #print(fitEstateSummary)
           #print(paste("Freiheitsgrade: ", fitEstate$df.residual))
           #print(paste("Standardschätzfehler: ", round(fitEstateSummary$sigma,3)))
           #print(paste("R-Quadrat: ", round(fitEstateSummary$r.squared,3)))
@@ -330,7 +362,7 @@ createFeatureDF <- function(input) {
   return(df_immo_empty)
 }
 
-createFormula <- function(input) {
+createFormula <- function(input,ignore) {
   formula <- "baseRent ~"
   usedFieldCount <- 0
   fieldList <- list(list(field='regio1', value = input$switchBL),
@@ -348,7 +380,8 @@ createFormula <- function(input) {
             list(field='balcony', value = input$switchB)
   )
   for(fl in fieldList) {
-    if(fl$value) {
+    #print(paste(fl$value, fl$field, ignore))
+    if(fl$value && !(fl$field %in% ignore)) {
       usedFieldCount <- usedFieldCount + 1
       if(usedFieldCount == 1) {
         formula <- str_c(formula, fl$field, sep = " ")
