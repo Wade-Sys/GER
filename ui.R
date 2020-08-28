@@ -35,7 +35,7 @@ shinyUI(
             tabItems(
                 tabItem(tabName = "dashBoard",
                     fluidRow(
-                        column(6,
+                        column(8,
                             tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL, height = "100%",
                                 tabPanel(tagList(tags$h3("Kaltmiete:")),
                                     fluidRow(
@@ -73,7 +73,7 @@ shinyUI(
                                 )
                             )
                         ),
-                        column(6,
+                        column(4,
                            box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
                                fluidRow(
                                    column(6,
@@ -84,7 +84,7 @@ shinyUI(
                                    )
                                ),
                                fluidRow(
-                                   column(12,plotOutput("dbPlotMapGermany",height = 1000)),
+                                   column(12,plotOutput("dbPlotMapGermany",height = 600)),
                                    #column(12,leafletOutput("dbPlotMapGermany"))
                                )
                            )

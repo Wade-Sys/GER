@@ -15,8 +15,12 @@ library(sp)
 library(mapproj)
 
 #df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
-dfBundesland <- read_csv2(file = "geo_bundesland.csv")
-dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
+#dfBundesland <- read_csv2(file = "geo_bundesland.csv")
+#dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
+
+dfBundesland <- mapBundesland
+dfLandkreis <- mapLandkreis
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -28,6 +32,7 @@ shinyServer(function(input, output, session) {
     heatingType <- reactive(unique(sort(data_immo()$heatingType)))
     data_immo_subset_db <- reactive(0)
     immoDashboardStatistics <- reactive(0)
+    mapGerman <- ggplot() + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
     
     ## Tab: dashboard
     ## ---------------------------------------------------------------------------------------------------------------------------------
@@ -54,17 +59,24 @@ shinyServer(function(input, output, session) {
     observe(priority = 100, {
       
       # Subset data by Bundesland and Landkreis for computation
-      if(input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") {
+      if((input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") || (input$dbBundesland == "" && input$dbLandkreis == "")){
         data_immo_subset_db <- data_immo()
+        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
       }
       else if(input$dbBundesland == "Alle" && input$dbLandkreis != "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(input$dbLandkreis, data_immo()$regio2))
+        mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, grepl(input$dbLandkreis,dfLandkreis$landkreis)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis == "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(input$dbBundesland, data_immo()$regio1))
+        mapGerman <- mapGerman + geom_polygon(data = subset(dfBundesland, grepl(input$dbBundesland,dfBundesland$bundesland)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis != "Alle") {
          data_immo_subset_db <- subset(data_immo(), grepl(input$dbBundesland, data_immo()$regio1) & grepl(input$dbLandkreis, data_immo()$regio2))
+         mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, grepl(input$dbLandkreis,dfLandkreis$landkreis)), aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+      }
+      else {
+        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
       }
       
       immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db))
@@ -134,20 +146,11 @@ shinyServer(function(input, output, session) {
         infoBox(title = ".75-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q75"], icon = icon("credit-card"), fill = TRUE)
       })
       
-    })
-    
-    observe(priority = 100, {
+      #Render German map
       output$dbPlotMapGermany <- renderPlot({
-        
-        # ggplot() +  geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#59b2a3", color="black") + theme_void() +
-        #   #geom_polygon(data = tidy(gerKrsMap), aes( x = long, y = lat, group = group), fill="red", color="grey") + theme_void()
-        #   geom_polygon(data = subset(dfBundesland, id == 6), aes( x = long, y = lat, group = group, fill = "red"), color="grey") + theme(legend.position = "none")
-        #
-        ggplot() +  geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#59b2a3", color="black") + theme_void() +
-          #geom_polygon(data = tidy(gerKrsMap), aes( x = long, y = lat, group = group), fill="red", color="grey") + theme_void()
-          geom_polygon(data = subset(dfLandkreis, landkreis =="Ostalbkreis"), aes( x = long, y = lat, group = group, fill = "red"), color="grey") + theme(legend.position = "none")
-        
+        mapGerman
       })
+      
     })
     
     
@@ -322,9 +325,7 @@ createFeatureDF <- function(input) {
     noRooms = input$noRooms,
     floor = input$floor,
     garden = input$garden,
-    regio2 = input$landkreis,
-    regio3 = NA,
-    date = NA
+    regio2 = input$landkreis
     )
   return(df_immo_empty)
 }
