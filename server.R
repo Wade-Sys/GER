@@ -337,10 +337,22 @@ shinyServer(function(input, output, session) {
     ## ---------------------------------------------------------------------------------------------------------------------------------
     ## Tab: baseData
     # Datetable for data overview
-    output$data_table <- DT::renderDataTable(data_immo(), options = list(scrollX = TRUE), class = 'table-bordered table-striped',
-      filter = 'top', server = TRUE, style = "bootstrap", rownames = FALSE, selection = "none",
-      colnames = c("Bundesland","Nebenkosten","Heizungsart","Balkon","Baujahr","Küche","Keller","Kaltmiete","Wohnfläche","Aufzug","Wohnungstyp","PLZ","Zimmeranzahl","Stockwerk","Garten","Landkreis")
-    )
+    output$data_table <- DT::renderDataTable(
+      datatable(data_immo(), 
+        options = list(
+          scrollX = TRUE,
+          language = list(
+            info = '_START_ bis _END_ von _TOTAL_ Datensätzen',
+            paginate = list(previous = 'Zurück', `next` = 'Vor'),
+            lengthMenu = '_MENU_ Einträge pro Seite',
+            search = 'Suche:',
+            thousands = '.'
+          )
+        ), 
+        filter = 'top',  class = 'table-bordered table-striped',  rownames = FALSE, selection = "none",
+        colnames = c("Bundesland","Nebenkosten","Heizungsart","Balkon","Baujahr","Küche","Keller","Kaltmiete","Wohnfläche","Aufzug","Wohnungstyp","PLZ","Zimmeranzahl","Stockwerk","Garten","Landkreis")
+      ) %>% formatCurrency(c(2,8), '\U20AC', digits = 2, before = FALSE) %>% formatCurrency(9, 'qm', digits = 2, before = FALSE) %>% formatStyle()
+    ) 
 
 })
 ###### Helper functions
