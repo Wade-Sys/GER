@@ -14,12 +14,9 @@ library(rgdal)
 library(sp)
 library(mapproj)
 
-df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
-dfBundesland <- read_csv2(file = "geo_bundesland.csv")
-dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
-
-dfBundesland <- mapBundesland
-dfLandkreis <- mapLandkreis
+#df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
+#dfBundesland <- read_csv2(file = "geo_bundesland.csv")
+#dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
 
 
 # Define server logic required to draw a histogram
@@ -32,7 +29,7 @@ shinyServer(function(input, output, session) {
     heatingType <- reactive(unique(sort(data_immo()$heatingType)))
     data_immo_subset_db <- reactive(0)
     immoDashboardStatistics <- reactive(0)
-    mapGerman <- ggplot() + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
+    mapGerman <- ggplot() + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
     # Replace TRUE/FALSE for Datatable
     exploreImmoDataTable <- df_immo_cleaned
     exploreImmoDataTable$balcony <- ifelse(exploreImmoDataTable$balcony == TRUE, "Ja", "Nein")
@@ -40,6 +37,7 @@ shinyServer(function(input, output, session) {
     exploreImmoDataTable$lift <- ifelse(exploreImmoDataTable$lift == TRUE, "Ja", "Nein")
     exploreImmoDataTable$hasKitchen <- ifelse(exploreImmoDataTable$hasKitchen == TRUE, "Ja", "Nein")
     exploreImmoDataTable$garden <- ifelse(exploreImmoDataTable$garden == TRUE, "Ja", "Nein")
+    
     
     ## Tab: dashboard
     ## ---------------------------------------------------------------------------------------------------------------------------------
@@ -72,28 +70,28 @@ shinyServer(function(input, output, session) {
       # Subset data by Bundesland and Landkreis for computation
       if((input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") || (input$dbBundesland == "" && input$dbLandkreis == "")){
         data_immo_subset_db <- data_immo()
-        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
+        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
       }
       else if(input$dbBundesland == "Alle" && input$dbLandkreis != "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(greplInputLandkreis, data_immo()$regio2))
         mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, 
                                 grepl(greplInputLandkreis,dfLandkreis$landkreis)), 
-                                aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+                                aes( x = long, y = lat, group = group),fill = "#f49c68", color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis == "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1))
         mapGerman <- mapGerman + geom_polygon(data = subset(dfBundesland, 
                                 grepl(greplInputBundesland,dfBundesland$bundesland)), 
-                                aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+                                aes( x = long, y = lat, group = group), fill = "#f49c68", color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis != "Alle") {
          data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1) & grepl(greplInputLandkreis, data_immo()$regio2))
          mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, 
                                 grepl(greplInputLandkreis,dfLandkreis$landkreis)), 
-                                aes( x = long, y = lat, group = group, fill = "coral1"), color="grey") + theme(legend.position = "none")
+                                aes( x = long, y = lat, group = group), fill = "#f49c68", color="grey") + theme(legend.position = "none")
       }
       else {
-        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="deepskyblue1", color="coral1") + theme_void()
+        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
       }
       
       immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db))
@@ -120,6 +118,16 @@ shinyServer(function(input, output, session) {
       output$dbInfoBoxBaseRentQ75 <- renderInfoBox({
         infoBox(title = ".75-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","q75"], " €"), icon = icon("credit-card"), fill = TRUE)
       })
+      output$dbBaseRentBoxplot <- renderPlot({
+         ggplot(as.data.frame(data_immo_subset_db), aes(x = baseRent)) + 
+          geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
+          scale_x_log10() +
+          annotation_logticks(sides = "b") +
+          xlab("Kaltmiete in €") +
+          theme_bw(base_size = 22,base_line_size = 22/44) +
+          theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())
+      })
+      
       
       # Render Dasboard info boxes:
       ## LivingSpace
@@ -141,6 +149,15 @@ shinyServer(function(input, output, session) {
       output$dbInfoBoxLivingSpaceQ75 <- renderInfoBox({
         infoBox(title = ".75-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","q75"], " qm"),icon = icon("credit-card"), fill = TRUE)
       })
+      output$dbLivingSpaceBoxplot <- renderPlot({
+        ggplot(as.data.frame(data_immo_subset_db), aes(x = livingSpace)) + 
+          geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
+          scale_x_continuous() +
+          #annotation_logticks(sides = "b") +
+          xlab("Wohnfläche in qm") +
+          theme_bw(base_size = 22,base_line_size = 22/44) +
+          theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())
+      })
       
       # Render Dasboard info boxes:
       ## NoRooms
@@ -161,6 +178,15 @@ shinyServer(function(input, output, session) {
       })
       output$dbInfoBoxNoRoomsQ75 <- renderInfoBox({
         infoBox(title = ".75-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q75"], icon = icon("credit-card"), fill = TRUE)
+      })
+      output$dbNoRoomsBoxplot <- renderPlot({
+        ggplot(as.data.frame(data_immo_subset_db), aes(x = noRooms)) + 
+          geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
+          scale_x_continuous() +
+          #annotation_logticks(sides = "b") +
+          xlab("Anzahl der Zimmer") +
+          theme_bw(base_size = 22,base_line_size = 22/44) +
+          theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())
       })
       
       #Render German map

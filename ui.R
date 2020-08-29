@@ -48,6 +48,12 @@ shinyUI(
                                         infoBoxOutput("dbInfoBoxBaseRentMax"),
                                         infoBoxOutput("dbInfoBoxBaseRentQ25"),
                                         infoBoxOutput("dbInfoBoxBaseRentQ75")
+                                    ),
+                                    fluidRow(column(12,
+                                            box(width = NULL, solidHeader = FALSE, status = "primary",
+                                                plotOutput("dbBaseRentBoxplot")
+                                            )
+                                        )
                                     )
                                 ),
                                 tabPanel(tagList(tags$h3("Wohnfläche:")),
@@ -58,6 +64,12 @@ shinyUI(
                                         infoBoxOutput("dbInfoBoxLivingSpaceMax"),
                                         infoBoxOutput("dbInfoBoxLivingSpaceQ25"),
                                         infoBoxOutput("dbInfoBoxLivingSpaceQ75")
+                                    ),
+                                    fluidRow(column(12,
+                                                    box(width = NULL, solidHeader = FALSE, status = "primary",
+                                                        plotOutput("dbLivingSpaceBoxplot")
+                                                    )
+                                    )
                                     )
                                 ),
                                 tabPanel(tagList(tags$h3("Anzahl Zimmer:")),
@@ -69,8 +81,11 @@ shinyUI(
                                          infoBoxOutput("dbInfoBoxNoRoomsQ25"),
                                          infoBoxOutput("dbInfoBoxNoRoomsQ75")
                                      ),
-                                     fluidRow(
-                                         #plotOutput("dbPlotHistNoRooms")
+                                     fluidRow(column(12,
+                                                     box(width = NULL, solidHeader = FALSE, status = "primary",
+                                                         plotOutput("dbNoRoomsBoxplot")
+                                                     )
+                                     )
                                      )
                                      
                                 )
