@@ -32,9 +32,9 @@ shinyUI(
         ),
         dashboardBody(
             useShinyjs(),
-            shinyDashboardThemes(
-                theme = "blue_gradient"
-            ),
+             shinyDashboardThemes(
+                 theme = "blue_gradient"
+             ),
             tabItems(
                 tabItem(tabName = "dashBoard",
                     fluidRow(
@@ -51,10 +51,15 @@ shinyUI(
                                     ),
                                     fluidRow(column(12,
                                             box(width = NULL, solidHeader = FALSE, status = "primary",
-                                                plotOutput("dbBaseRentBoxplot")
+                                                fluidRow(
+                                                    column(12,plotOutput("dbBaseRentBoxplot"))
+                                                ),
+                                                fluidRow(column(12,sliderInput("dbBaseRentBoxplotSlider",label = "Innerhalb des Datensatzes eingränzen:",step = 50, min = 50, max = 20000, value = c(50,20000),width = NULL))
+                                                )
                                             )
                                         )
-                                    )
+                                    ),
+                                    
                                 ),
                                 tabPanel(tagList(tags$h3("Wohnfläche:")),
                                     fluidRow(
@@ -112,7 +117,7 @@ shinyUI(
                 tabItem(tabName = "baseData",
                     fluidRow(
                         column(12, 
-                            box(width = NULL, solidHeader = TRUE, status = "primary", title = tags$h3("Der Inhalt des verwendeten Datensatzes in Tabellenform:"),
+                            box(width = NULL, solidHeader = TRUE, status = "primary", title = "Der zugrunde liegende Datensatz als Tabelle:",
                                 dataTableOutput("data_table")    
                             )
                         )
@@ -251,7 +256,7 @@ shinyUI(
                                             )
                                         )
                                     ),
-                                    actionButton("getPrice", "Mietpreis schätzen", width = "100%", class="btn btn-info")
+                                    actionButton("getPrice", "Mietpreis schätzen", width = "100%", class="btn-info", style="background-color:#00a65a; color:white")
                                 )
                             )
                         ),

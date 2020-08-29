@@ -50,10 +50,12 @@ write.csv2(df_clean_na, file = "data/immo_scout_cleaned_cols_no_na.csv",row.name
 
 df_clean_1 <- subset(df_clean_na, floor < 64) # Hoechste Gebaude in DE hat 63 Stockwerke
 df_clean_2 <- subset(df_clean_1, noRooms > 0) # Es muss mindesten ein Zimmer vorhanden sein
-df_clean_3 <- subset(df_clean_2, livingSpace > 0) # Wohnflaeche muss gueltig sein
+df_clean_2 <- subset(df_clean_2, noRooms < 15) # Mehr als 15 Zimmer ist unplausibel
+df_clean_3 <- subset(df_clean_2, livingSpace > 5) # Wohnflaeche muss gueltig sein
+df_clean_3 <- subset(df_clean_3, livingSpace < 600) # Wohnflaeche muss gueltig sein
 df_clean_4 <- subset(df_clean_3, yearConstructed > 1214) # Das aelteste Haus in DE ist 1215
 df_clean_4 <- subset(df_clean_4, yearConstructed < 2021) # Erhebung war in 2018 und 2019. Vielleicht wurden Wohnung angeboten die in 2020 fertigstellt werden
-df_clean_5 <- subset(df_clean_4, baseRent > 0) # Miete muss groesser 0 sein
+df_clean_5 <- subset(df_clean_4, baseRent > 70) # Miete muss groesser 0 und plausibel sein
 df_clean_5 <- subset(df_clean_5, baseRent != 999) # unplasible Werte
 df_clean_5 <- subset(df_clean_5, baseRent != 9999) # unplasible Werte
 df_clean_5 <- subset(df_clean_5, baseRent != 99999) # unplasible Werte
