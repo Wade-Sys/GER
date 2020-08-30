@@ -99,10 +99,11 @@ shinyServer(function(input, output, session) {
       immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db,fields = "all"))
       #print(immoDashboardStatistics())
       
-      updateSliderInput(session = session, inputId = "dbBaseRentBoxplotSlider",
-                        min = immoDashboardStatistics()["dfSummaryBaseRent","min"], 
-                        max = immoDashboardStatistics()["dfSummaryBaseRent","max"],
-                        value = c(immoDashboardStatistics()["dfSummaryBaseRent","min"],immoDashboardStatistics()["dfSummaryBaseRent","max"]))
+      #ONLY TEST: Slider
+      # updateSliderInput(session = session, inputId = "dbBaseRentBoxplotSlider",
+      #                   min = immoDashboardStatistics()["dfSummaryBaseRent","min"], 
+      #                   max = immoDashboardStatistics()["dfSummaryBaseRent","max"],
+      #                   value = c(immoDashboardStatistics()["dfSummaryBaseRent","min"],immoDashboardStatistics()["dfSummaryBaseRent","max"]))
       
       
       # Render Dasboard info boxes:
@@ -129,7 +130,7 @@ shinyServer(function(input, output, session) {
          ggplot(as.data.frame(data_immo_subset_db), aes(x = baseRent)) + 
           geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
           #scale_x_continuous(trans = "log10",breaks = c(c(50,200,300),seq(400,1000,200),seq(1500,20000,5000)),limits = input$dbBaseRentBoxplotSlider) +
-          scale_x_continuous(trans = "log10",limits = input$dbBaseRentBoxplotSlider) +
+          scale_x_continuous(trans = "log10") +
           annotation_logticks(sides = "b") +
           xlab("Kaltmiete in €") +
           theme_bw(base_size = 22,base_line_size = 22/44) +
@@ -425,19 +426,19 @@ createFeatureDF <- function(input) {
 createFormula <- function(input,ignore) {
   formula <- "baseRent ~"
   usedFieldCount <- 0
-  fieldList <- list(list(field='regio1', value = input$switchBL),
-            list(field='regio2', value = input$switchLK),
-            list(field='typeOfFlat', value = input$switchTOF),
-            list(field='heatingType', value = input$switchHT),
-            list(field='yearConstructed', value = input$switchYC),
-            list(field='livingSpace', value = input$switchLS),
-            list(field='noRooms', value = input$switchNR),
-            list(field='floor', value = input$switchF),
-            list(field='hasKitchen', value = input$switchHK),
-            list(field='cellar', value = input$switchC),
-            list(field='lift', value = input$switchL),
-            list(field='garden', value = input$switchG),
-            list(field='balcony', value = input$switchB)
+  fieldList <- list(list(field='regio1', value = input$switchBL, sep = "+"),
+            list(field='regio2', value = input$switchLK, sep = "+"),
+            list(field='typeOfFlat', value = input$switchTOF, sep = "+"),
+            list(field='heatingType', value = input$switchHT, sep = "+"),
+            list(field='yearConstructed', value = input$switchYC, sep = "+"),
+            list(field='livingSpace', value = input$switchLS, sep = "+"),
+            list(field='noRooms', value = input$switchNR, sep = "+"),
+            list(field='floor', value = input$switchF, sep = "+"),
+            list(field='hasKitchen', value = input$switchHK, sep = "+"),
+            list(field='cellar', value = input$switchC, sep = "+"),
+            list(field='lift', value = input$switchL, sep = "+"),
+            list(field='garden', value = input$switchG, sep = "+"),
+            list(field='balcony', value = input$switchB, sep = "+")
   )
   for(fl in fieldList) {
     #print(paste(fl$value, fl$field, ignore))
@@ -446,7 +447,7 @@ createFormula <- function(input,ignore) {
       if(usedFieldCount == 1) {
         formula <- str_c(formula, fl$field, sep = " ")
       } else {
-        formula <- str_c(formula, fl$field, sep = " + ")
+        formula <- str_c(formula, fl$field, sep = fl$sep)
       }
     }
   }
@@ -454,7 +455,7 @@ createFormula <- function(input,ignore) {
   if(usedFieldCount == 0) {
     formula <- 0
   }
-  
+  print(formula)
   return(formula)
 }
 

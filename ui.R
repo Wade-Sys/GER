@@ -54,8 +54,8 @@ shinyUI(
                                                 fluidRow(
                                                     column(12,plotOutput("dbBaseRentBoxplot"))
                                                 ),
-                                                fluidRow(column(12,sliderInput("dbBaseRentBoxplotSlider",label = "Innerhalb des Datensatzes eingränzen:",step = 50, min = 50, max = 20000, value = c(50,20000),width = NULL))
-                                                )
+                                                #Slider Test
+                                                #fluidRow(column(12,sliderInput("dbBaseRentBoxplotSlider",label = "Innerhalb des Datensatzes eingränzen:",step = 50, min = 50, max = 20000, value = c(50,20000),width = NULL)))
                                             )
                                         )
                                     ),
