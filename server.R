@@ -1,4 +1,4 @@
-
+# Bibliotheken laden.
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
@@ -14,14 +14,15 @@ library(rgdal)
 library(sp)
 library(mapproj)
 
+# Daten laden.
 #df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
 #dfBundesland <- read_csv2(file = "geo_bundesland.csv")
 #dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
 
 
-# Define server logic required to draw a histogram
+# Server Logik.
 shinyServer(function(input, output, session) {
-    # Create reactive datasets
+    # Reaktive Datensaetze vorbereiten
     data_immo <- reactive(df_immo_cleaned)
     bundeslaender <- reactive(unique(sort(data_immo()$regio1)))
     landkreiseAll <- reactive(unique(data_immo()[c('regio1','regio2')]))
@@ -29,8 +30,11 @@ shinyServer(function(input, output, session) {
     heatingType <- reactive(unique(sort(data_immo()$heatingType)))
     data_immo_subset_db <- reactive(0)
     immoDashboardStatistics <- reactive(0)
+    
+    # Deutschlandkarte fuer das Dashboard initial erstellen.
     mapGerman <- ggplot() + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
-    # Replace TRUE/FALSE for Datatable
+    
+    # Boolesche Werte fuer die Tabelle mit JA/NEIN ersetzen.
     exploreImmoDataTable <- df_immo_cleaned
     exploreImmoDataTable$balcony <- ifelse(exploreImmoDataTable$balcony == TRUE, "Ja", "Nein")
     exploreImmoDataTable$cellar <- ifelse(exploreImmoDataTable$cellar == TRUE, "Ja", "Nein")
@@ -38,16 +42,16 @@ shinyServer(function(input, output, session) {
     exploreImmoDataTable$hasKitchen <- ifelse(exploreImmoDataTable$hasKitchen == TRUE, "Ja", "Nein")
     exploreImmoDataTable$garden <- ifelse(exploreImmoDataTable$garden == TRUE, "Ja", "Nein")
     
-    
-    ## Tab: dashboard
+    ## ---------------------------------------------------------------------------------------------------------------------------------
+    ## Dashboard-Tab: dashboard
     ## ---------------------------------------------------------------------------------------------------------------------------------
    
-    # Observe Bundesland
+    # Dropdown: Bundesland; Hinzufuegen der "Alle" option,
     observe(priority = 100, {
       updateSelectInput(session = session, inputId = "dbBundesland", choices = c("Alle",bundeslaender()))
     })
     
-    # Observe Landkreis
+    # Dropdown: Landkreis; Hinzufuegen der "Alle" option. Auswahlmoeglichkeiten nach Bundesland einschraenken.
     observe(priority = 100, {
       if(input$dbBundesland == 'Alle') {
         dbLkSelected <- subset(landkreiseAll(), select = c("regio2"))
@@ -60,54 +64,58 @@ shinyServer(function(input, output, session) {
       
     })
     
-    # Observe values
+    # Werte und Diagramme im Dashboard je nach ausgewaehlten Bundesland und Landkreis berechnen.
     observe(priority = 100, {
       
+      # Ersetzungesvariable setzen.
       greplInputBundesland <- paste0('^',input$dbBundesland,'$')
       greplInputLandkreis <- paste0('^',input$dbLandkreis,'$')
-      greplInputLandkreis <- str_replace_all(str_replace_all(greplInputLandkreis,"\\(","\\\\("),"\\)","\\\\)") # Klammer muessen fuer die Suche ersetzt werden
+      greplInputLandkreis <- str_replace_all(str_replace_all(greplInputLandkreis,"\\(","\\\\("),"\\)","\\\\)") # Klammer muessen fuer die Suche ersetzt werden.
       
-      # Subset data by Bundesland and Landkreis for computation
+      
+      # Alle Datensaetze fuer den ausgewaehlten Landkreis und Bundesland zum Berechnen extrahieren und die Geo-Daten vorbereiten.
       if((input$dbBundesland == "Alle" && input$dbLandkreis == "Alle") || (input$dbBundesland == "" && input$dbLandkreis == "")){
         data_immo_subset_db <- data_immo()
-        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
+        
+        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, 
+                                aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
       }
       else if(input$dbBundesland == "Alle" && input$dbLandkreis != "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(greplInputLandkreis, data_immo()$regio2))
+        
         mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, 
                                 grepl(greplInputLandkreis,dfLandkreis$landkreis)), 
                                 aes( x = long, y = lat, group = group),fill = "#f49c68", color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis == "Alle") {
         data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1))
+        
         mapGerman <- mapGerman + geom_polygon(data = subset(dfBundesland, 
                                 grepl(greplInputBundesland,dfBundesland$bundesland)), 
                                 aes( x = long, y = lat, group = group), fill = "#f49c68", color="grey") + theme(legend.position = "none")
       }
       else if(input$dbBundesland != "Alle" && input$dbLandkreis != "Alle") {
          data_immo_subset_db <- subset(data_immo(), grepl(greplInputBundesland, data_immo()$regio1) & grepl(greplInputLandkreis, data_immo()$regio2))
+         
          mapGerman <- mapGerman + geom_polygon(data = subset(dfLandkreis, 
                                 grepl(greplInputLandkreis,dfLandkreis$landkreis)), 
                                 aes( x = long, y = lat, group = group), fill = "#f49c68", color="grey") + theme(legend.position = "none")
       }
       else {
-        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
+        mapGerman <- mapGerman + geom_polygon(data = dfBundesland, 
+                                aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
       }
       
-      
-      
+      # Desktriptive Statistken berechnen.
       immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db,fields = "all"))
+      
+      #DEBUG: Ergebnisse auf der Konsole ausgeben.
       #print(immoDashboardStatistics())
+
+
+      # Berechnete Statistiken in den Info-Boxen anzeigen.
       
-      #ONLY TEST: Slider
-      # updateSliderInput(session = session, inputId = "dbBaseRentBoxplotSlider",
-      #                   min = immoDashboardStatistics()["dfSummaryBaseRent","min"], 
-      #                   max = immoDashboardStatistics()["dfSummaryBaseRent","max"],
-      #                   value = c(immoDashboardStatistics()["dfSummaryBaseRent","min"],immoDashboardStatistics()["dfSummaryBaseRent","max"]))
-      
-      
-      # Render Dasboard info boxes:
-      ## BaseRent
+      # Stasistiken Info-Box: BaseRent (Kaltmiete).
       output$dbInfoBoxBaseRentAvg <- renderInfoBox({
         infoBox(title = "Arithmetisches Mittel", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","avg"], " €"), icon = icon("euro-sign"), fill = TRUE)
       })
@@ -126,10 +134,10 @@ shinyServer(function(input, output, session) {
       output$dbInfoBoxBaseRentQ75 <- renderInfoBox({
         infoBox(title = ".75-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryBaseRent","q75"], " €"), icon = icon("euro-sign"), fill = TRUE)
       })
+      # Boxplot: BaseRent (Kaltmiete).
       output$dbBaseRentBoxplot <- renderPlot({
          ggplot(as.data.frame(data_immo_subset_db), aes(x = baseRent)) + 
           geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
-          #scale_x_continuous(trans = "log10",breaks = c(c(50,200,300),seq(400,1000,200),seq(1500,20000,5000)),limits = input$dbBaseRentBoxplotSlider) +
           scale_x_continuous(trans = "log10") +
           annotation_logticks(sides = "b") +
           xlab("Kaltmiete in €") +
@@ -138,8 +146,7 @@ shinyServer(function(input, output, session) {
       })
       
       
-      # Render Dasboard info boxes:
-      ## LivingSpace
+      # Stasistiken Info-Box: LivingSpace (Wohnflaeche).
       output$dbInfoBoxLivingSpaceAvg <- renderInfoBox({
         infoBox(title = "Arithmetisches Mittel", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","avg"], " qm"), icon = icon("ruler-combined"), fill = TRUE)
       })
@@ -158,6 +165,7 @@ shinyServer(function(input, output, session) {
       output$dbInfoBoxLivingSpaceQ75 <- renderInfoBox({
         infoBox(title = ".75-Quantil", value = paste0(immoDashboardStatistics()["dfSummaryLivingSpace","q75"], " qm"),icon = icon("ruler-combined"), fill = TRUE)
       })
+      # Boxplot: LivingSpace (Wohnflaeche).
       output$dbLivingSpaceBoxplot <- renderPlot({
         ggplot(as.data.frame(data_immo_subset_db), aes(x = livingSpace)) + 
           geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
@@ -167,8 +175,8 @@ shinyServer(function(input, output, session) {
           theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())
       })
       
-      # Render Dasboard info boxes:
-      ## NoRooms
+      
+      # Stasistiken Info-Box: noRooms (Anzahl Zimmer).
       output$dbInfoBoxNoRoomsAvg <- renderInfoBox({
         infoBox(title = "Arithmetisches Mittel", value = immoDashboardStatistics()["dfSummaryNoRooms","avg"], icon = icon("building"), fill = TRUE)
       })
@@ -187,6 +195,7 @@ shinyServer(function(input, output, session) {
       output$dbInfoBoxNoRoomsQ75 <- renderInfoBox({
         infoBox(title = ".75-Quantil", value = immoDashboardStatistics()["dfSummaryNoRooms","q75"], icon = icon("building"), fill = TRUE)
       })
+      # Boxplot: noRooms (Anzahl Zimmer).
       output$dbNoRoomsBoxplot <- renderPlot({
         ggplot(as.data.frame(data_immo_subset_db), aes(x = noRooms)) + 
           geom_boxplot(outlier.fill = "#f49c68",outlier.colour = "#000000", outlier.shape = 21,outlier.size = 2, fill = "#009abf", colour = "#f49c68") +
@@ -196,26 +205,29 @@ shinyServer(function(input, output, session) {
           theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())
       })
       
-      #Render German map
+      
+      # Deutschlandkarte auf Basis den ausgewaehlten Daten zeichen.
       output$dbPlotMapGermany <- renderPlot({
         mapGerman
       })
       
     })
     
-    
-    ## Tab: rpe
     ## ---------------------------------------------------------------------------------------------------------------------------------
-    # Observe initial dataset
+    ## Dashboard-Tab: rpe (Mietpreisschaetzung)
+    ## ---------------------------------------------------------------------------------------------------------------------------------
+    
+    # Datensaetze vorbereiten und leere Value-Boxen und Residuendiagramme rendern.
     observe(priority = 100,{
+      # Datensaetze fuer Dropdown selektieren (ausser Landkreis).
       updateSelectInput(session = session, inputId = "bundesland", choices = bundeslaender())
       updateSelectInput(session = session, inputId = "typeOfFlat", choices = typeOfFlat())
       updateSelectInput(session = session, inputId = "heatingType", choices = heatingType())
       
+      # Value-Boxen mit dem Wert "0" rendern.
       output$vBoxPrice <- renderValueBox({ 
         valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0("0.00", "€"), icon = icon("building"), color = "green")
       })
-      
       output$degreesOfFreedom <-renderValueBox({ 
         valueBox(subtitle = "Freiheitsgrade: ", value = paste0("0.000"), icon = icon("ruler-combined"), color = "green")
       })
@@ -231,10 +243,11 @@ shinyServer(function(input, output, session) {
       output$fStatistic <- renderValueBox({ 
         valueBox(subtitle = "Teststatistik F-Wert: ", value = paste0("0.000"), icon = icon("vial"), color = "green")
       })
-      output$pValueFromFtest <- renderValueBox({ 
-        valueBox(subtitle = "p-Wert des F-Tests", value = paste0("0.000"), icon = icon("vials"), color = "green")
-      })
+      #output$pValueFromFtest <- renderValueBox({ 
+      #  valueBox(subtitle = "p-Wert des F-Tests", value = paste0("0.000"), icon = icon("vials"), color = "green")
+      #})
       
+      # Leere Residuendiagramme rendern.
       output$plotModellResiduals_1 <-renderPlot({
         plot(0)
       })
@@ -249,19 +262,19 @@ shinyServer(function(input, output, session) {
       })
     })
     
-    # Observe toggles
+    # Parameter fuer die Mietpreisschaetzug rendern. Je nach dem, ob auf der Oberflaeche der Schalten gesetzt wurde oder nicht.
     observe(priority = 100, {
-      # Toggle Region
+      # Togggles fuer die Parameter: Region.
       toggle(id = "bundesland",anim = TRUE,animType = "fade", condition = input$switchBL)
       toggle(id = "landkreis",anim = TRUE,animType = "fade", condition = input$switchLK)
-      # Toggle Wohnungsparameter
+      # Togggles fuer die Parameter: Wohnungsparameter.
       toggle(id = "typeOfFlat",anim = TRUE,animType = "fade", condition = input$switchTOF)
       toggle(id = "yearConstructed",anim = TRUE,animType = "fade", condition = input$switchYC)
       toggle(id = "heatingType",anim = TRUE,animType = "fade", condition = input$switchHT)
       toggle(id = "livingSpace",anim = TRUE,animType = "fade", condition = input$switchLS)
       toggle(id = "noRooms",anim = TRUE,animType = "fade", condition = input$switchNR)
       toggle(id = "floor",anim = TRUE,animType = "fade", condition = input$switchF)
-      # Toggle Ausstattung
+      # Togggles fuer die Parameter: Ausstattung.
       toggle(id = "hasKitchen",anim = TRUE,animType = "fade", condition = input$switchHK)
       toggle(id = "cellar",anim = TRUE,animType = "fade", condition = input$switchC)
       toggle(id = "lift",anim = TRUE,animType = "fade", condition = input$switchL)
@@ -269,9 +282,8 @@ shinyServer(function(input, output, session) {
       toggle(id = "balcony",anim = TRUE,animType = "fade", condition = input$switchB)
     })
     
-    # Observe Landkreise
+    # Drop-Down: Landkreis in Abhaengigkeiten des Bundeslandes selektieren.
     observe(priority = 100, {
-      # Filter dataset for landkreise
       if(input$switchBL) {
         landkreiseSelected <- subset(landkreiseAll(), grepl(paste0('^',input$bundesland,'$'), landkreiseAll()$regio1),select = c("regio2"))
         updateSelectInput(session = session, inputId = "landkreis", choices = sort(unique(landkreiseSelected$regio2)))
@@ -281,20 +293,26 @@ shinyServer(function(input, output, session) {
       }
     })
     
-    ## ObserveEvent: getPrice
+    # Action-Button: "Mietpreis schaetzen" (getPrice).
     observeEvent(input$getPrice,{
+      # Formel fuer die Regression erstellen.
       lmFormula <- createFormula(input,ignore = NA)
+      
+      # Datensatz mit Werten genieren die fuer die Vorhersage genutzt werden sollen.
       dfDatasetToPredict <- createFeatureDF(input)
+      
+      # Variable fuer die Datengrundlage leer intialisieren.
       data_immo_subset <- 0
-      if(lmFormula == 0) {
+      
+      if(lmFormula == 0) { # Wenn kein Formel ermittelt wurde, dann muss der geschaetze Werte auf 0 gesetzt werden.
         predictEstate <- 0
       }
       else {
         withProgress(message = "Mietpreis wird geschätzt...", value = 0, min =0, max = 100, {
-          incProgress(amount = 25, message = paste("Modell wird berechnet..."))
-          # Subselect data by regio1 and regio2
+          incProgress(amount = 25, message = paste("Modell wird berechnet...")) # Ladebalkeninformation
           
-          
+          # Datengrundlage auf Basis des ausgewaehlten Bundeslandes und Langkreises festlegen.
+          # Dementsprechend die Formel fuer die Regression anpassen.
           if(input$switchBL == TRUE && input$switchLK == TRUE) {
             data_immo_subset <- subset(data_immo(), grepl(paste0('^',input$bundesland,'$'),data_immo()$regio1) & grepl(paste0('^',input$landkreis,'$'),data_immo()$regio2), select = -c(regio1,regio2))
             lmFormula <- createFormula(input,c("regio1","regio2"))
@@ -312,23 +330,25 @@ shinyServer(function(input, output, session) {
             lmFormula <- createFormula(input, ignore = NA)
           }
           
-          #print(data_immo_subset)
-          
-          
-          
+          # Vorhersagemodell generieren und die Vorhersage treffen.
           fitEstate <- lm(data_immo_subset, formula = lmFormula)
-          incProgress(amount = 50, message = paste("Mietpreis wird geschäzt..."))
+          incProgress(amount = 50, message = paste("Mietpreis wird geschäzt...")) # Ladebalkeninformation
           predictEstate <- predict(object = fitEstate, dfDatasetToPredict)
-        
+          # DEBUG:
           #print(summary(fitEstate$signifi))
           #print(predictEstate)
+          
+          # Den geschaetzten Mietpreis in der Value-Box anzeigen.
           output$vBoxPrice <- renderValueBox({ 
             valueBox(subtitle = "Geschätzter Mietpreis: ", value = paste0(round(predictEstate,2), "€"), icon = icon("building"), color = "green")
           })
           
-          incProgress(amount = 75, message = paste("Angaben zum Modell werden ermittelt..."))
-          
+                    
+          incProgress(amount = 75, message = paste("Angaben zum Modell werden ermittelt...")) # Ladebalkeninformation
+          # Angaben zum Modell mit "summary" extrahieren.
           fitEstateSummary <- summary(fitEstate)
+          
+          # DEBUG:
           #print(fitEstateSummary)
           #print(paste("Freiheitsgrade: ", fitEstate$df.residual))
           #print(paste("Standardschätzfehler: ", round(fitEstateSummary$sigma,3)))
@@ -338,6 +358,7 @@ shinyServer(function(input, output, session) {
           #print(paste("p-Wert: ",round(pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE),3)))
           
           
+          # Aus den zusammengefassten Daten zum Modell die einzelnen Modell angaben in den Value-Boxen anzeigen.
           output$degreesOfFreedom <-renderValueBox({ 
             valueBox(subtitle = "Freiheitsgrade: ", value = paste0(fitEstate$df.residual), icon = icon("ruler-combined"), color = "green")
           })
@@ -353,11 +374,13 @@ shinyServer(function(input, output, session) {
           output$fStatistic <- renderValueBox({ 
             valueBox(subtitle = "Teststatistik F-Wert: ", value = paste0(round(fitEstateSummary$fstatistic[1],3)), icon = icon("vial"), color = "green")
           })
-          output$pValueFromFtest <- renderValueBox({ 
-            valueBox(subtitle = "p-Wert des F-Tests", value = paste0(round(pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE),3)), icon = icon("vials"), color = "green")
-          })
+          #output$pValueFromFtest <- renderValueBox({ 
+          #  valueBox(subtitle = "p-Wert des F-Tests", value = paste0(round(pf(fitEstateSummary$fstatistic[1],fitEstateSummary$fstatistic[2],fitEstateSummary$fstatistic[3],lower.tail = FALSE),3)), icon = icon("vials"), color = "green")
+          #})
           
-          incProgress(amount = 75, message = paste("Residuendiagramme werden generiert..."))
+          incProgress(amount = 75, message = paste("Residuendiagramme werden generiert...")) # Ladebalkeninformation
+          
+          # Residuendiagramme aus dem Modell rendern.
           output$plotModellResiduals_1 <-renderPlot({
             plot(fitEstate,which= 1)
           })
@@ -374,11 +397,14 @@ shinyServer(function(input, output, session) {
         })
       }
     })
-    ## ---------------------------------------------------------------------------------------------------------------------------------
-    ## Tab: baseData
-    # Datetable for data overview
-  
     
+    ## ---------------------------------------------------------------------------------------------------------------------------------
+    ## Dashboard-Tab: baseData (Datengrundlage)
+    ## ---------------------------------------------------------------------------------------------------------------------------------
+    
+    # Datengrundlage als Tabelle rendern.
+    # Uebersetzung einiger Tabellenparameter in Deutsch.
+    # Uebersetzung der technischen Spaltennamen.
     output$data_table <- DT::renderDataTable(
       datatable(exploreImmoDataTable, 
         options = list(
@@ -398,7 +424,12 @@ shinyServer(function(input, output, session) {
     ) 
 
 })
-###### Helper functions
+
+## ---------------------------------------------------------------------------------------------------------------------------------
+## Hilfsfunktionen
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+# Datensatz mit Werten genieren die fuer die Vorhersage genutzt werden sollen.
 createFeatureDF <- function(input) {
   df_immo_empty <- df_immo_cleaned[1,]
   df_immo_empty[1,] <- NA
@@ -423,6 +454,7 @@ createFeatureDF <- function(input) {
   return(df_immo_empty)
 }
 
+# Formel fuer die Regression erstellen.
 createFormula <- function(input,ignore) {
   formula <- "baseRent ~"
   usedFieldCount <- 0
@@ -441,7 +473,6 @@ createFormula <- function(input,ignore) {
             list(field='balcony', value = input$switchB, sep = "+")
   )
   for(fl in fieldList) {
-    #print(paste(fl$value, fl$field, ignore))
     if(fl$value && !(fl$field %in% ignore)) {
       usedFieldCount <- usedFieldCount + 1
       if(usedFieldCount == 1) {
@@ -455,10 +486,12 @@ createFormula <- function(input,ignore) {
   if(usedFieldCount == 0) {
     formula <- 0
   }
-  print(formula)
+  # DEBUG: 
+  #print(formula)
   return(formula)
 }
 
+# Desktriptive Statistken berechnen.
 computeDashboardStatistics <-function(immo_data, fields) {
   
   if(fields == "all" || fields == "baseRent") {

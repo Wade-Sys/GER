@@ -1,4 +1,4 @@
-
+# Bibliotheken laden.
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
@@ -15,9 +15,11 @@ library(sp)
 library(mapproj)
 
 
-# Helper functions
-
-# Define UI for application that draws a histogram
+# UI-Logik
+# Das Layout der UI basiert auf Shinydashboard
+# Desweiteren wurden fuer zusaetzliche Elemente "shinyWidgets" verwenden.
+# Fuer die Tabellen wird "DT" verwendet.
+# Das Theme kommt aus der Library "dashboardthemes"
 shinyUI(
     
     dashboardPage(
@@ -36,10 +38,16 @@ shinyUI(
                  theme = "blue_gradient"
              ),
             tabItems(
+                ## ---------------------------------------------------------------------------------------------------------------------------------
+                ## Dashboard-Tab: dashboard
+                ## ---------------------------------------------------------------------------------------------------------------------------------
                 tabItem(tabName = "dashBoard",
                     fluidRow(
+                        #### Linke Box: Statistische Kennzahlen
                         column(8,
+                            #### Tab-Panel
                             tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL, height = "100%",
+                                #### Tab: Kaltmiete
                                 tabPanel(tagList(tags$h3("Kaltmiete:")),
                                     fluidRow(
                                         infoBoxOutput("dbInfoBoxBaseRentAvg"),
@@ -49,18 +57,9 @@ shinyUI(
                                         infoBoxOutput("dbInfoBoxBaseRentQ25"),
                                         infoBoxOutput("dbInfoBoxBaseRentQ75")
                                     ),
-                                    fluidRow(column(12,
-                                            box(width = NULL, solidHeader = FALSE, status = "primary",
-                                                fluidRow(
-                                                    column(12,plotOutput("dbBaseRentBoxplot"))
-                                                ),
-                                                #Slider Test
-                                                #fluidRow(column(12,sliderInput("dbBaseRentBoxplotSlider",label = "Innerhalb des Datensatzes eingränzen:",step = 50, min = 50, max = 20000, value = c(50,20000),width = NULL)))
-                                            )
-                                        )
-                                    ),
-                                    
+                                    fluidRow(column(12,box(width = NULL, solidHeader = FALSE, status = "primary",column(12,plotOutput("dbBaseRentBoxplot"))))),
                                 ),
+                                #### Tab: Wohnflaeche
                                 tabPanel(tagList(tags$h3("Wohnfläche:")),
                                     fluidRow(
                                         infoBoxOutput("dbInfoBoxLivingSpaceAvg"),
@@ -70,13 +69,9 @@ shinyUI(
                                         infoBoxOutput("dbInfoBoxLivingSpaceQ25"),
                                         infoBoxOutput("dbInfoBoxLivingSpaceQ75")
                                     ),
-                                    fluidRow(column(12,
-                                                    box(width = NULL, solidHeader = FALSE, status = "primary",
-                                                        plotOutput("dbLivingSpaceBoxplot")
-                                                    )
-                                    )
-                                    )
+                                    fluidRow(column(12,box(width = NULL, solidHeader = FALSE, status = "primary",plotOutput("dbLivingSpaceBoxplot"))))
                                 ),
+                                #### Tab: Anzahl Zimmer
                                 tabPanel(tagList(tags$h3("Anzahl Zimmer:")),
                                      fluidRow(
                                          infoBoxOutput("dbInfoBoxNoRoomsAvg"),
@@ -86,16 +81,11 @@ shinyUI(
                                          infoBoxOutput("dbInfoBoxNoRoomsQ25"),
                                          infoBoxOutput("dbInfoBoxNoRoomsQ75")
                                      ),
-                                     fluidRow(column(12,
-                                                     box(width = NULL, solidHeader = FALSE, status = "primary",
-                                                         plotOutput("dbNoRoomsBoxplot")
-                                                     )
-                                     )
-                                     )
-                                     
+                                     fluidRow(column(12,box(width = NULL, solidHeader = FALSE, status = "primary",plotOutput("dbNoRoomsBoxplot"))))
                                 )
                             )
                         ),
+                        #### Rechte Box: Deutschlandkarte und Drop-Downs
                         column(4,
                            box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
                                fluidRow(
@@ -108,12 +98,14 @@ shinyUI(
                                ),
                                fluidRow(
                                    column(12,plotOutput("dbPlotMapGermany",height = 600)),
-                                   #column(12,leafletOutput("dbPlotMapGermany"))
                                )
                            )
                         )
                     )
-                ),
+                ), # Ende: tabItem - Dashboard
+                ## ---------------------------------------------------------------------------------------------------------------------------------
+                ## Dashboard-Tab: baseData
+                ## ---------------------------------------------------------------------------------------------------------------------------------
                 tabItem(tabName = "baseData",
                     fluidRow(
                         column(12, 
@@ -122,12 +114,17 @@ shinyUI(
                             )
                         )
                     )
-                ),
+                ), # Ende: tabItem - BaseData
+                ## ---------------------------------------------------------------------------------------------------------------------------------
+                ## Dashboard-Tab: rpe (Mietpreisschaetzung)
+                ## ---------------------------------------------------------------------------------------------------------------------------------
                 tabItem(tabName = "rpe",
                     fluidRow(
+                        #### Linke Box
                         column(width=5,
                             box(width=NULL, solidHeader = TRUE, status = "primary", title = "(1) Welche Parameter sollen bei der Schätzung berücksichtigt werden?",
                                 column(12,
+                                    #### Box: Region
                                     box(width=NULL, solidHeader = TRUE, status = "warning", title = "Region:",collapsible = TRUE, collapsed = FALSE,
                                         fluidRow(
                                             column(12,
@@ -150,6 +147,7 @@ shinyUI(
                                             )  
                                         )
                                     ),
+                                    #### Box: Wohnungsparameter
                                     box(width=NULL, solidHeader = TRUE, status = "warning", title = "Wohnungsparameter:", collapsible = TRUE, collapsed = FALSE,
                                         fluidRow(
                                             column(6,
@@ -208,6 +206,7 @@ shinyUI(
                                             )
                                         ),
                                     ),
+                                    #### Box: Ausstattung
                                     box(width=NULL, solidHeader = TRUE, status = "warning", title = "Ausstattung", collapsible = TRUE, collapsed = FALSE,
                                         fluidRow(
                                             column(6,
@@ -256,17 +255,21 @@ shinyUI(
                                             )
                                         )
                                     ),
+                                    #### Action-Button Mietpreisschaetzung
                                     actionButton("getPrice", "Mietpreis schätzen", width = "100%", class="btn-info", style="background-color:#00a65a; color:white")
                                 )
                             )
                         ),
+                        #### Rechte Box
                         column(7,
                             box(width=NULL, solidHeader = TRUE, status = "primary", title = "(2) Ergebnisse der Mietpreisschätzung:",
+                                #### Zeile: Ergebniss der Mietreisschaetzung
                                 fluidRow(
                                     column(12,
                                            valueBoxOutput("vBoxPrice", width = NULL)       
                                     )
                                 ),
+                                #### Zeile: Angaben zum Modell
                                 fluidRow(
                                     column(12,
                                         box(width = NULL, solidHeader = TRUE, status = "warning", title = "Angaben zum Modell:",collapsible = TRUE, collapsed = TRUE,
@@ -278,11 +281,12 @@ shinyUI(
                                             fluidRow(
                                                 column(4,valueBoxOutput("residualStdError", width = NULL)),
                                                 column(4,valueBoxOutput("AdjRSquared", width = NULL)),
-                                                column(4,valueBoxOutput("pValueFromFtest", width = NULL))
+                                                #column(4,valueBoxOutput("pValueFromFtest", width = NULL))
                                             )
                                         )
                                     )  
                                 ),
+                                #### Zeile: Residuendiagramme
                                 fluidRow(
                                     column(12,
                                         box(width = NULL, solidHeader = TRUE, status = "warning", title = "Residuendiagramme:",collapsible = TRUE, collapsed = TRUE,
@@ -296,8 +300,8 @@ shinyUI(
                             )
                         )
                     )
-                )
-            )
-        )
-    )
+                ) # Ende: tabItem - rpe (Mietpreisschaetzung)
+            ) # Ende: tabItems
+        ) # Ende: dashboardBody
+    ) # Ende: dashboardPage
 )
