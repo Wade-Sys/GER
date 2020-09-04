@@ -81,7 +81,7 @@ shinyUI(
                                     ),
                                     fluidRow(
                                         column(12,
-                                            box(width = NULL, solidHeader = FALSE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
+                                            box(width = NULL, solidHeader = TRUE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
                                                 plotOutput("dbLivingSpaceBoxplot")
                                             )
                                         )
@@ -99,7 +99,7 @@ shinyUI(
                                      ),
                                      fluidRow(
                                          column(12,
-                                            box(width = NULL, solidHeader = FALSE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
+                                            box(width = NULL, solidHeader = TRUE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
                                                 plotOutput("dbNoRoomsBoxplot")
                                             )
                                         )
@@ -120,6 +120,10 @@ shinyUI(
                                ),
                                fluidRow(
                                    column(12,plotOutput("dbPlotMapGermany",height = 600)),
+                               ),
+                               fluidRow(
+                                   column(12, textOutput("selectedDatasetCount")
+                                 )
                                )
                            )
                         )

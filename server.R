@@ -35,6 +35,7 @@ shinyServer(function(input, output, session) {
     heatingType <- reactive(unique(sort(data_immo()$heatingType)))
     data_immo_subset_db <- reactive(0)
     immoDashboardStatistics <- reactive(0)
+    numOfRowsInDataset <- nrow(df_immo_cleaned)
     
     # Deutschlandkarte fuer das Dashboard initial erstellen.
     mapGerman <- ggplot() + geom_polygon(data = dfBundesland, aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
@@ -110,6 +111,10 @@ shinyServer(function(input, output, session) {
         mapGerman <- mapGerman + geom_polygon(data = dfBundesland, 
                                 aes( x = long, y = lat, group = group), fill="#00c0ef", color="#f49c68") + theme_void()
       }
+      
+      output$selectedDatasetCount <- renderText({
+        paste(nrow(data_immo_subset_db), "von", numOfRowsInDataset, "Mietobjekten", sep = " ")
+      })
       
       # Desktriptive Statistken berechnen.
       immoDashboardStatistics <- reactive(computeDashboardStatistics(data_immo_subset_db,fields = "all"))
