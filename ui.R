@@ -1,18 +1,22 @@
 # Bibliotheken laden.
-library(shiny)
-library(shinydashboard)
-library(shinyWidgets)
-library(shinyjs)
-library(dashboardthemes)
-library(DT)
-library(ggplot2)
-library(tidyverse)
-library(broom)
-library(maps)
-library(mapdata)
-library(rgdal)
-library(sp)
-library(mapproj)
+library(install.load)
+install_load(
+    "shiny", "shinydashboard", "shinyWidgets", "shinyjs", "dashboardthemes", "DT", "ggplot2", "tidyverse", "broom", "maps", "mapdata", "rgdal", "sp", "mapproj"
+)
+#library(shiny)
+#library(shinydashboard)
+#library(shinyWidgets)
+#library(shinyjs)
+#library(dashboardthemes)
+#library(DT)
+#library(ggplot2)
+#library(tidyverse)
+#library(broom)
+#library(maps)
+#library(mapdata)
+#library(rgdal)
+#library(sp)
+#library(mapproj)
 
 
 # UI-Logik
