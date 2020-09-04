@@ -15,13 +15,14 @@ library(sp)
 library(mapproj)
 
 # Daten laden.
-#df_immo_cleaned <- read_csv2(file = "immo_scout_cleaned_final.csv")
-#dfBundesland <- read_csv2(file = "geo_bundesland.csv")
-#dfLandkreis <- read_csv2(file = "geo_landkreis.csv")
+df_immo_cleaned <- read_csv2(file = "data/immo_scout_cleaned_final.csv")
+dfBundesland <- read_csv2(file = "data/geo_bundesland.csv")
+dfLandkreis <- read_csv2(file = "data/geo_landkreis.csv")
 
 
 # Server Logik.
 shinyServer(function(input, output, session) {
+    print(getwd())
     # Reaktive Datensaetze vorbereiten
     data_immo <- reactive(df_immo_cleaned)
     bundeslaender <- reactive(unique(sort(data_immo()$regio1)))

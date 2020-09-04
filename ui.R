@@ -46,9 +46,9 @@ shinyUI(
                         #### Linke Box: Statistische Kennzahlen
                         column(8,
                             #### Tab-Panel
-                            tabBox(id = "tabBoxSK", title = tagList(tags$h2(icon("chart-pie"),"Statistische Kennzahlen:")), width = NULL, height = "100%",
+                            tabBox(id = "tabBoxSK", title = tagList(tags$span(icon("chart-pie"),"Statistische Kennzahlen:",style="font-size:28px")), width = NULL, height = "100%",
                                 #### Tab: Kaltmiete
-                                tabPanel(tagList(tags$h3("Kaltmiete:")),
+                                tabPanel(tagList(tags$span("Kaltmiete:",style="font-size:24px")), 
                                     fluidRow(
                                         infoBoxOutput("dbInfoBoxBaseRentAvg"),
                                         infoBoxOutput("dbInfoBoxBaseRentMedian"),
@@ -57,10 +57,16 @@ shinyUI(
                                         infoBoxOutput("dbInfoBoxBaseRentQ25"),
                                         infoBoxOutput("dbInfoBoxBaseRentQ75")
                                     ),
-                                    fluidRow(column(12,box(width = NULL, solidHeader = FALSE, status = "primary",column(12,plotOutput("dbBaseRentBoxplot"))))),
+                                    fluidRow(
+                                        column(12,
+                                            box(width = NULL, solidHeader = TRUE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
+                                                plotOutput("dbBaseRentBoxplot")
+                                            )
+                                        )
+                                    )
                                 ),
                                 #### Tab: Wohnflaeche
-                                tabPanel(tagList(tags$h3("Wohnfläche:")),
+                                tabPanel(tagList(tags$span("Wohnfläche:",style="font-size:24px")),
                                     fluidRow(
                                         infoBoxOutput("dbInfoBoxLivingSpaceAvg"),
                                         infoBoxOutput("dbInfoBoxLivingSpaceMedian"),
@@ -69,10 +75,16 @@ shinyUI(
                                         infoBoxOutput("dbInfoBoxLivingSpaceQ25"),
                                         infoBoxOutput("dbInfoBoxLivingSpaceQ75")
                                     ),
-                                    fluidRow(column(12,box(width = NULL, solidHeader = FALSE, status = "primary",plotOutput("dbLivingSpaceBoxplot"))))
+                                    fluidRow(
+                                        column(12,
+                                            box(width = NULL, solidHeader = FALSE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
+                                                plotOutput("dbLivingSpaceBoxplot")
+                                            )
+                                        )
+                                    )
                                 ),
                                 #### Tab: Anzahl Zimmer
-                                tabPanel(tagList(tags$h3("Anzahl Zimmer:")),
+                                tabPanel(tagList(tags$span("Anzahl Zimmer:",style="font-size:24px")),
                                      fluidRow(
                                          infoBoxOutput("dbInfoBoxNoRoomsAvg"),
                                          infoBoxOutput("dbInfoBoxNoRoomsMedian"),
@@ -81,13 +93,19 @@ shinyUI(
                                          infoBoxOutput("dbInfoBoxNoRoomsQ25"),
                                          infoBoxOutput("dbInfoBoxNoRoomsQ75")
                                      ),
-                                     fluidRow(column(12,box(width = NULL, solidHeader = FALSE, status = "primary",plotOutput("dbNoRoomsBoxplot"))))
+                                     fluidRow(
+                                         column(12,
+                                            box(width = NULL, solidHeader = FALSE, status = "primary", title = tagList(tags$span("Verteilung der Daten im Boxplot:",style="font-size:22px")),
+                                                plotOutput("dbNoRoomsBoxplot")
+                                            )
+                                        )
+                                    )
                                 )
                             )
                         ),
                         #### Rechte Box: Deutschlandkarte und Drop-Downs
                         column(4,
-                           box(width = NULL, status = "primary", title = "Region auswählen", solidHeader = TRUE,
+                           box(width = NULL, status = "primary", title = tagList(tags$span("Region auswählen",style="font-size:22px")), solidHeader = TRUE, style="font-size:18px",
                                fluidRow(
                                    column(6,
                                           selectInput("dbBundesland", "Bundesland", choices = NULL)       
