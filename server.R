@@ -1,3 +1,24 @@
+#################################### Projekt-Info ####################################
+# Gruppe: German Real Estate (GER)
+# Beteiligte: Boris Fredrich (79148); Paul Heiser (37931)
+# ---------------------------------------------------------------------------------- #
+# Verantwortlichkeiten: 
+# Jede Person war jeweils fuer Server- und UI-Logik sowie der notwendigen
+# Hilfsfunktionen der jeweilig Seite verantwortlich.
+#
+# # gemeinsam:
+# - Bereinigung der Datensaetze
+# - Layout des Projekts (Shiny-Dashboard)
+# - Seite: Datengrundlage
+# - Code-Korrekturen und Bereinigung
+#
+# # Boris Fredrich:
+# - Entwicklung der Dashboard-Seite
+# 
+# # Paul Heiser:
+# - Entwicklung der Mietpreisschaetzung
+######################################################################################
+
 # Bibliotheken laden.
 library(install.load)
 install_load(
@@ -49,7 +70,7 @@ shinyServer(function(input, output, session) {
     exploreImmoDataTable$garden <- ifelse(exploreImmoDataTable$garden == TRUE, "Ja", "Nein")
     
     ## ---------------------------------------------------------------------------------------------------------------------------------
-    ## Dashboard-Tab: dashboard
+    ## Dashboard-Tab: dashboard (Boris Fredrich)
     ## ---------------------------------------------------------------------------------------------------------------------------------
    
     # Dropdown: Bundesland; Hinzufuegen der "Alle" option,
@@ -224,7 +245,7 @@ shinyServer(function(input, output, session) {
     })
     
     ## ---------------------------------------------------------------------------------------------------------------------------------
-    ## Dashboard-Tab: rpe (Mietpreisschaetzung)
+    ## Dashboard-Tab: rpe (Mietpreisschaetzung) (Paul Heiser)
     ## ---------------------------------------------------------------------------------------------------------------------------------
     
     # Datensaetze vorbereiten und leere Value-Boxen und Residuendiagramme rendern.
@@ -409,7 +430,7 @@ shinyServer(function(input, output, session) {
     })
     
     ## ---------------------------------------------------------------------------------------------------------------------------------
-    ## Dashboard-Tab: baseData (Datengrundlage)
+    ## Dashboard-Tab: baseData (Datengrundlage) (gemeinsam)
     ## ---------------------------------------------------------------------------------------------------------------------------------
     
     # Datengrundlage als Tabelle rendern.
@@ -439,7 +460,7 @@ shinyServer(function(input, output, session) {
 ## Hilfsfunktionen
 ## ---------------------------------------------------------------------------------------------------------------------------------
 
-# Datensatz mit Werten genieren die fuer die Vorhersage genutzt werden sollen.
+# Datensatz mit Werten genieren die fuer die Vorhersage genutzt werden sollen. (P.Heiser)
 createFeatureDF <- function(input) {
   df_immo_empty <- df_immo_cleaned[1,]
   df_immo_empty[1,] <- NA
@@ -464,7 +485,7 @@ createFeatureDF <- function(input) {
   return(df_immo_empty)
 }
 
-# Formel fuer die Regression erstellen.
+# Formel fuer die Regression erstellen. (P.Heiser)
 createFormula <- function(input,ignore) {
   formula <- "baseRent ~"
   usedFieldCount <- 0
@@ -501,7 +522,7 @@ createFormula <- function(input,ignore) {
   return(formula)
 }
 
-# Desktriptive Statistken berechnen.
+# Desktriptive Statistken berechnen. (B. Fredrich)
 computeDashboardStatistics <-function(immo_data, fields) {
   
   if(fields == "all" || fields == "baseRent") {
@@ -538,4 +559,5 @@ computeDashboardStatistics <-function(immo_data, fields) {
   return(rbind(dfSummaryBaseRent, dfSummaryLivingSpace, dfSummaryNoRooms))
 }
 
-
+## ---------------------------------------------------------------------------------------------------------------------------------
+## ---------------------------------------------------------------------------------------------------------------------------------

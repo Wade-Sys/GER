@@ -1,3 +1,24 @@
+#################################### Projekt-Info ####################################
+# Gruppe: German Real Estate (GER)
+# Beteiligte: Boris Fredrich (79148); Paul Heiser (37931)
+# ---------------------------------------------------------------------------------- #
+# Verantwortlichkeiten: 
+# Jede Person war jeweils fuer Server- und UI-Logik sowie der notwendigen
+# Hilfsfunktionen der jeweilig Seite verantwortlich.
+#
+# # gemeinsam:
+# - Bereinigung der Datensaetze
+# - Layout des Projekts (Shiny-Dashboard)
+# - Seite: Datengrundlage
+# - Code-Korrekturen und Bereinigung
+#
+# # Boris Fredrich:
+# - Entwicklung der Dashboard-Seite
+# 
+# # Paul Heiser:
+# - Entwicklung der Mietpreisschaetzung
+######################################################################################
+
 # Bibliotheken laden.
 library(install.load)
 install_load(
@@ -43,7 +64,7 @@ shinyUI(
              ),
             tabItems(
                 ## ---------------------------------------------------------------------------------------------------------------------------------
-                ## Dashboard-Tab: dashboard
+                ## Dashboard-Tab: dashboard (Boris Fredrich)
                 ## ---------------------------------------------------------------------------------------------------------------------------------
                 tabItem(tabName = "dashBoard",
                     fluidRow(
@@ -130,7 +151,7 @@ shinyUI(
                     )
                 ), # Ende: tabItem - Dashboard
                 ## ---------------------------------------------------------------------------------------------------------------------------------
-                ## Dashboard-Tab: baseData
+                ## Dashboard-Tab: baseData (gemeinsam)
                 ## ---------------------------------------------------------------------------------------------------------------------------------
                 tabItem(tabName = "baseData",
                     fluidRow(
@@ -142,7 +163,7 @@ shinyUI(
                     )
                 ), # Ende: tabItem - BaseData
                 ## ---------------------------------------------------------------------------------------------------------------------------------
-                ## Dashboard-Tab: rpe (Mietpreisschaetzung)
+                ## Dashboard-Tab: rpe (Mietpreisschaetzung) (Paul Heiser)
                 ## ---------------------------------------------------------------------------------------------------------------------------------
                 tabItem(tabName = "rpe",
                     fluidRow(
